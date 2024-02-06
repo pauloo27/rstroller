@@ -1,6 +1,9 @@
 use common;
 
 fn main() {
-    let name = common::get_name();
-    println!("Hello {name}");
+    let player = common::get_player();
+    match player {
+        Some(player) => println!("Player: {}", player.identity()),
+        None => println!("No player found"),
+    }
 }
