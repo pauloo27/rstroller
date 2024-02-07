@@ -7,10 +7,7 @@ const PREFERRED_PLAYER_FILE_PATH: &'static str = "/dev/shm/rstroller-player";
 pub fn get_preferred_player() -> Option<String> {
     match fs::read_to_string(Path::new(PREFERRED_PLAYER_FILE_PATH)) {
         Ok(content) => Some(content.trim().to_string()),
-        Err(err) => {
-            eprintln!("Failed to read preferred player file: {}", err);
-            None
-        }
+        Err(_) => None,
     }
 }
 
