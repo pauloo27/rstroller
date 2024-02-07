@@ -1,62 +1,73 @@
-use std::{collections::HashMap, rc::Rc};
+use std::fmt::Display;
+use std::str::FromStr;
 
-mod command_name;
+mod app;
+pub use app::App;
 
-pub use command_name::CommandName;
+pub mod commands;
+
+#[derive(Hash, Eq, PartialEq, Clone)]
+pub enum CommandName {
+    Help,
+    ListPlayers,
+    Play,
+    Pause,
+    PlayPause,
+}
+
+impl CommandName {
+    pub fn value(&self) -> &'static str {
+        match self {
+            CommandName::Help => "help",
+            CommandName::ListPlayers => "list-players",
+            CommandName::Play => "play",
+            CommandName::Pause => "pause",
+            CommandName::PlayPause => "play-pause",
+        }
+    }
+}
+
+impl FromStr for CommandName {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "help" => Ok(CommandName::Help),
+            "list-players" => Ok(CommandName::ListPlayers),
+            "play" => Ok(CommandName::Play),
+            "pause" => Ok(CommandName::Pause),
+            "play-pause" => Ok(CommandName::PlayPause),
+            _ => Err(()),
+        }
+    }
+}
+
+impl Display for CommandName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value())
+    }
+}
+
+pub struct CommandExecContext<'a> {
+    app: &'a App<'a>,
+}
 
 pub struct Command<'a> {
     pub name: CommandName,
     pub description: String,
-    pub handler: &'a dyn Fn(Rc<Command>),
+    pub handler: &'a dyn Fn(CommandExecContext),
 }
 
 impl<'a> Command<'a> {
-    pub fn new(name: CommandName, description: String, handler: &dyn Fn(Rc<Command>)) -> Command {
+    pub fn new(
+        name: CommandName,
+        description: String,
+        handler: &dyn Fn(CommandExecContext),
+    ) -> Command {
         Command {
             name,
             description,
             handler,
-        }
-    }
-}
-
-pub struct App<'a> {
-    pub name: String,
-    pub description: String,
-    pub commands: HashMap<CommandName, Rc<Command<'a>>>,
-}
-
-impl<'a> App<'a> {
-    pub fn new(name: String, description: String) -> Self {
-        App {
-            name,
-            description,
-            commands: HashMap::new(),
-        }
-    }
-
-    pub fn add_command(mut self, cmd: Rc<Command<'a>>) -> Self {
-        self.commands.insert(cmd.name.clone(), cmd);
-        self
-    }
-
-    pub fn run(&mut self) -> Option<CommandName> {
-        let arg = std::env::args().nth(1)?;
-        let cmd_name = CommandName::from(&arg)?;
-
-        match self.commands.get(&cmd_name) {
-            None => Some(cmd_name),
-            Some(cmd) => {
-                (cmd.handler)(cmd.clone());
-                Some(cmd_name)
-            }
-        }
-    }
-
-    pub fn help(&self) {
-        println!("-> {} - {}", self.name, self.description);
-        for (_, cmd) in &self.commands {
-            println!("    -> {} - {}", cmd.name, cmd.description);
         }
     }
 }
