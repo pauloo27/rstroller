@@ -22,8 +22,14 @@ pub fn get_player() -> Result<Option<mpris::Player>, String> {
     let preferred_player = get_preferred_player()?;
 
     if let Some(preferred_player) = preferred_player {
-        let player = finder.find_by_name(preferred_player.as_str());
-        return player.map_err(|e| e.to_string()).map(|p| Some(p));
+        for player in finder.iter_players().map_err(|e| e.to_string())? {
+            let player = player.map_err(|e| e.to_string())?;
+            if player.bus_name() == preferred_player {
+                return Ok(Some(player));
+            }
+        }
+
+        return Ok(None);
     }
 
     Ok(finder
