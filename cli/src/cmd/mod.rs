@@ -1,12 +1,13 @@
 use std::fmt::Display;
 use std::str::FromStr;
+use strum_macros::EnumIter;
 
 mod app;
 pub use app::App;
 
 pub mod commands;
 
-#[derive(Hash, Eq, PartialEq, Clone)]
+#[derive(EnumIter, Hash, Eq, PartialEq, Clone)]
 pub enum CommandName {
     Help,
     ListPlayers,
@@ -38,6 +39,25 @@ impl FromStr for CommandName {
             "pause" => Ok(CommandName::Pause),
             "play-pause" => Ok(CommandName::PlayPause),
             _ => Err(()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::CommandName;
+    use strum::IntoEnumIterator;
+
+    #[test]
+    fn test_command_name_from_str() {
+        for cmd in CommandName::iter() {
+            let value = cmd.value();
+
+            let cmd_from_str: CommandName = value
+                .parse()
+                .expect(format!("CommandName cannot be parsed from value {value}").as_str());
+
+            assert_eq!(value, cmd_from_str.value());
         }
     }
 }
