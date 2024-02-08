@@ -1,34 +1,34 @@
 use super::CommandExecContext;
 use common;
 use mpris::{DBusError, PlayerFinder};
+use std::process;
 
 pub fn help_cmd(ctx: CommandExecContext) {
     ctx.app.help();
 }
 
-pub fn play_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.play(), "play");
+pub fn play_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "play", |player| player.play());
 }
 
-pub fn pause_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.pause(), "pause");
+pub fn pause_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "pause", |player| player.pause());
 }
 
-pub fn play_pause_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.play_pause(), "play/pause");
+pub fn play_pause_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "play/pause", |player| player.play_pause());
 }
 
-pub fn stop_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.stop(), "stop");
+pub fn stop_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "stop", |player| player.stop());
 }
 
-pub fn next_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.next(), "next");
+pub fn next_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "next", |player| player.next());
 }
 
-
-pub fn previous_cmd(_: CommandExecContext) {
-    exec_player_action(|player| player.previous(), "previous");
+pub fn previous_cmd(ctx: CommandExecContext) {
+    exec_player_action(ctx, "previous", |player| player.previous());
 }
 
 pub fn list_players_cmd(_: CommandExecContext) {
@@ -47,15 +47,24 @@ pub fn list_players_cmd(_: CommandExecContext) {
     }
 }
 
-pub fn exec_player_action<F>(action: F, action_name: &str)
+pub fn exec_player_action<F>(ctx: CommandExecContext, action_name: &str, action: F)
 where
     F: FnOnce(mpris::Player) -> Result<(), DBusError>,
 {
-    let player = common::get_player().expect("Failed to get player");
+    let player = match ctx.args.flags.get("player") {
+        None => common::get_preferred_player().expect("Failed to get preferred player"),
+        Some(player_name) => {
+            common::get_player_by_bus_name(player_name).expect("Failed to get player")
+        }
+    };
+
     match player {
         Some(player) => {
             action(player).expect(format!("Failed to call action {action_name}").as_str())
         }
-        None => eprintln!("No player found"),
+        None => {
+            eprintln!("No player found");
+            process::exit(1);
+        }
     }
 }

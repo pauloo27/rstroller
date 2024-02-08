@@ -1,8 +1,10 @@
+use args::ParsedArgs;
 use std::fmt::Display;
 use std::str::FromStr;
 use strum_macros::EnumIter;
 
 mod app;
+mod args;
 pub use app::App;
 
 pub mod commands;
@@ -79,6 +81,31 @@ impl Display for CommandName {
 
 pub struct CommandExecContext<'a> {
     app: &'a App<'a>,
+    args: ParsedArgs,
+}
+
+#[derive(Debug)]
+pub struct CommandFlag {
+    pub name: &'static str,
+    pub short_name: Option<&'static str>,
+    pub description: &'static str,
+    pub has_value: bool,
+}
+
+impl CommandFlag {
+    pub fn new(
+        name: &'static str,
+        short_name: Option<&'static str>,
+        description: &'static str,
+        has_value: bool,
+    ) -> Self {
+        CommandFlag {
+            name,
+            short_name,
+            description,
+            has_value,
+        }
+    }
 }
 
 pub struct Command<'a> {

@@ -1,6 +1,16 @@
 mod cmd;
 
-use cmd::{commands, App, Command, CommandName};
+use cmd::{commands, App, Command, CommandFlag, CommandName};
+use once_cell::sync::Lazy;
+
+static PLAYER_FLAG: Lazy<CommandFlag> = Lazy::new(|| {
+    CommandFlag::new(
+        "player",
+        Some("p"),
+        "Specify the player for a single command",
+        true,
+    )
+});
 
 fn main() {
     let mut app = new_app();
@@ -15,6 +25,7 @@ fn new_app() -> App<'static> {
         String::from("rstroller"),
         String::from("player controller for MPRIS"),
     )
+    .add_flag(&PLAYER_FLAG)
     .add_command(Command::new(
         CommandName::Help,
         String::from("show command usage"),
