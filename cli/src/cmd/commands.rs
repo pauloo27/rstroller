@@ -7,24 +7,27 @@ pub fn help_cmd(ctx: CommandExecContext) {
 }
 
 pub fn play_cmd(_: CommandExecContext) {
-    common::get_player()
-        .expect("Failed to get player")
-        .play()
-        .expect("Failed to play");
+    let player = common::get_player().expect("Failed to get player");
+    match player {
+        Some(player) => player.play().expect("Failed to play"),
+        None => eprintln!("No player found"),
+    }
 }
 
 pub fn pause_cmd(_: CommandExecContext) {
-    common::get_player()
-        .expect("Failed to get player")
-        .pause()
-        .expect("Failed to play");
+    let player = common::get_player().expect("Failed to get player");
+    match player {
+        Some(player) => player.pause().expect("Failed to pause"),
+        None => eprintln!("No player found"),
+    }
 }
 
 pub fn play_pause_cmd(_: CommandExecContext) {
-    common::get_player()
-        .expect("Failed to get player")
-        .play_pause()
-        .expect("Failed to play");
+    let player = common::get_player().expect("Failed to get player");
+    match player {
+        Some(player) => player.play_pause().expect("Failed to play/pause"),
+        None => eprintln!("No player found"),
+    }
 }
 
 pub fn list_players_cmd(_: CommandExecContext) {
