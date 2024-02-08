@@ -14,6 +14,9 @@ pub enum CommandName {
     Play,
     Pause,
     PlayPause,
+    Stop,
+    Next,
+    Previous,
 }
 
 impl CommandName {
@@ -24,6 +27,9 @@ impl CommandName {
             CommandName::Play => "play",
             CommandName::Pause => "pause",
             CommandName::PlayPause => "play-pause",
+            CommandName::Stop => "stop",
+            CommandName::Next => "next",
+            CommandName::Previous => "previous",
         }
     }
 }
@@ -38,6 +44,9 @@ impl FromStr for CommandName {
             "play" => Ok(CommandName::Play),
             "pause" => Ok(CommandName::Pause),
             "play-pause" => Ok(CommandName::PlayPause),
+            "stop" => Ok(CommandName::Stop),
+            "next" => Ok(CommandName::Next),
+            "previous" => Ok(CommandName::Previous),
             _ => Err(()),
         }
     }

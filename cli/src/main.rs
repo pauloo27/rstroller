@@ -27,17 +27,32 @@ fn new_app() -> App<'static> {
     ))
     .add_command(Command::new(
         CommandName::Play,
-        String::from("send the play command to the preferred player"),
+        String::from(r#"send the "play" command to the preferred player"#),
         &commands::play_cmd,
     ))
     .add_command(Command::new(
         CommandName::Pause,
-        String::from("send the pause command to the preferred player"),
+        String::from(r#"send the "pause" command to the preferred player"#),
         &commands::pause_cmd,
     ))
     .add_command(Command::new(
         CommandName::PlayPause,
-        String::from("send the play/pause command to the preferred player"),
+        String::from(r#"send the "play/pause" command to the preferred player"#),
         &commands::play_pause_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Stop,
+        String::from(r#"send the "stop" command to the preferred player"#),
+        &commands::stop_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Next,
+        String::from(r#"send the "next" command to the preferred player"#),
+        &commands::next_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Previous,
+        String::from(r#"send the "previous" command to the preferred player"#),
+        &commands::previous_cmd,
     ))
 }

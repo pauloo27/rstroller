@@ -18,6 +18,19 @@ pub fn play_pause_cmd(_: CommandExecContext) {
     exec_player_action(|player| player.play_pause(), "play/pause");
 }
 
+pub fn stop_cmd(_: CommandExecContext) {
+    exec_player_action(|player| player.stop(), "stop");
+}
+
+pub fn next_cmd(_: CommandExecContext) {
+    exec_player_action(|player| player.next(), "next");
+}
+
+
+pub fn previous_cmd(_: CommandExecContext) {
+    exec_player_action(|player| player.previous(), "previous");
+}
+
 pub fn list_players_cmd(_: CommandExecContext) {
     let players = PlayerFinder::new()
         .expect("Failed create PlayerFinder")
