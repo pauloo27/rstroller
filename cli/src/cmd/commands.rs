@@ -1,33 +1,21 @@
 use super::CommandExecContext;
 use common;
-use mpris::PlayerFinder;
+use mpris::{DBusError, PlayerFinder};
 
 pub fn help_cmd(ctx: CommandExecContext) {
     ctx.app.help();
 }
 
 pub fn play_cmd(_: CommandExecContext) {
-    let player = common::get_player().expect("Failed to get player");
-    match player {
-        Some(player) => player.play().expect("Failed to play"),
-        None => eprintln!("No player found"),
-    }
+    exec_player_action(|player| player.play(), "play");
 }
 
 pub fn pause_cmd(_: CommandExecContext) {
-    let player = common::get_player().expect("Failed to get player");
-    match player {
-        Some(player) => player.pause().expect("Failed to pause"),
-        None => eprintln!("No player found"),
-    }
+    exec_player_action(|player| player.pause(), "pause");
 }
 
 pub fn play_pause_cmd(_: CommandExecContext) {
-    let player = common::get_player().expect("Failed to get player");
-    match player {
-        Some(player) => player.play_pause().expect("Failed to play/pause"),
-        None => eprintln!("No player found"),
-    }
+    exec_player_action(|player| player.play_pause(), "play/pause");
 }
 
 pub fn list_players_cmd(_: CommandExecContext) {
@@ -43,5 +31,18 @@ pub fn list_players_cmd(_: CommandExecContext) {
 
     for player in players {
         println!("{}: {}", player.identity(), player.bus_name());
+    }
+}
+
+pub fn exec_player_action<F>(action: F, action_name: &str)
+where
+    F: FnOnce(mpris::Player) -> Result<(), DBusError>,
+{
+    let player = common::get_player().expect("Failed to get player");
+    match player {
+        Some(player) => {
+            action(player).expect(format!("Failed to call action {action_name}").as_str())
+        }
+        None => eprintln!("No player found"),
     }
 }
