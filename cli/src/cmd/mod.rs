@@ -13,6 +13,7 @@ pub mod commands;
 pub enum CommandName {
     Help,
     ListPlayers,
+    Status,
     SetPreferredPlayer,
     Play,
     Pause,
@@ -20,6 +21,8 @@ pub enum CommandName {
     Stop,
     Next,
     Previous,
+    Raise,
+    Volume,
 }
 
 impl CommandName {
@@ -27,6 +30,7 @@ impl CommandName {
         match self {
             CommandName::Help => "help",
             CommandName::ListPlayers => "list-players",
+            CommandName::Status => "status",
             CommandName::SetPreferredPlayer => "set-preferred-player",
             CommandName::Play => "play",
             CommandName::Pause => "pause",
@@ -34,6 +38,8 @@ impl CommandName {
             CommandName::Stop => "stop",
             CommandName::Next => "next",
             CommandName::Previous => "previous",
+            CommandName::Raise => "raise",
+            CommandName::Volume => "volume",
         }
     }
 }
@@ -45,6 +51,7 @@ impl FromStr for CommandName {
         match s {
             "help" => Ok(CommandName::Help),
             "list-players" => Ok(CommandName::ListPlayers),
+            "status" => Ok(CommandName::Status),
             "play" => Ok(CommandName::Play),
             "pause" => Ok(CommandName::Pause),
             "play-pause" => Ok(CommandName::PlayPause),
@@ -52,6 +59,8 @@ impl FromStr for CommandName {
             "next" => Ok(CommandName::Next),
             "previous" => Ok(CommandName::Previous),
             "set-preferred-player" => Ok(CommandName::SetPreferredPlayer),
+            "raise" => Ok(CommandName::Raise),
+            "volume" => Ok(CommandName::Volume),
             _ => Err(()),
         }
     }
@@ -60,6 +69,7 @@ impl FromStr for CommandName {
 #[cfg(test)]
 mod tests {
     use super::CommandName;
+    use std::collections::HashMap;
     use strum::IntoEnumIterator;
 
     #[test]
@@ -72,6 +82,19 @@ mod tests {
                 .expect(format!("CommandName cannot be parsed from value {value}").as_str());
 
             assert_eq!(value, cmd_from_str.value());
+        }
+    }
+
+    #[test]
+    fn test_no_duplicates() {
+        let mut values = HashMap::new();
+        for cmd in CommandName::iter() {
+            let value = cmd.value();
+
+            if values.contains_key(value) {
+                panic!("Duplicate value: {}", value);
+            }
+            values.insert(value, true);
         }
     }
 }

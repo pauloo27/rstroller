@@ -42,6 +42,11 @@ fn new_app() -> App<'static> {
         &commands::set_preferred_player_cmd,
     ))
     .add_command(Command::new(
+        CommandName::Status,
+        String::from("return the playback status of the preferred player"),
+        &commands::status_cmd,
+    ))
+    .add_command(Command::new(
         CommandName::Play,
         String::from(r#"send the "play" command to the preferred player"#),
         &commands::play_cmd,
@@ -70,5 +75,15 @@ fn new_app() -> App<'static> {
         CommandName::Previous,
         String::from(r#"send the "previous" command to the preferred player"#),
         &commands::previous_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Volume,
+        String::from("get or set the player volume, either as a absolute value (0.5) or a relative value (eg: 0.05- or 0.1+)"),
+        &commands::volume_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Raise,
+        String::from(r#"send the "raise" command to the preferred player"#),
+        &commands::raise_cmd,
     ))
 }

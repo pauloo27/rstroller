@@ -1,19 +1,19 @@
 # To-Do
 
 - `command` position [+offset/value?]
-- `command` volume [+offset/value?]
-- `command` status
 - `command` show
 - `command` metadata [key?]
 - `command` loop [status?]
 - `command` shuffle [status?]
 - `command` open [url]
-- `command` raise
 
 # Done
 
 - `ref` show (PREFERRED) in list-players
 - `command` set-preferred
+- `command` status
+- `command` raise
+- `command` volume [+offset/value?]
 
 # Backlog
 
