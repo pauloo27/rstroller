@@ -1,12 +1,12 @@
 use super::args;
 use super::{Command, CommandExecContext, CommandFlag, CommandName};
+use std::collections::HashMap;
 use std::process;
-use std::{collections::HashMap, rc::Rc};
 
 pub struct App<'a> {
     pub name: String,
     pub description: String,
-    pub commands: HashMap<CommandName, Rc<Command<'a>>>,
+    pub commands: HashMap<CommandName, Command<'a>>,
     pub flags: Vec<&'a CommandFlag>,
     pub arg_parser: args::ArgParser,
 }
@@ -29,8 +29,7 @@ impl<'a> App<'a> {
     }
 
     pub fn add_command(mut self, cmd: Command<'a>) -> Self {
-        let cmd_ref = Rc::new(cmd);
-        self.commands.insert(cmd_ref.name.clone(), cmd_ref);
+        self.commands.insert(cmd.name.clone(), cmd);
         self
     }
 

@@ -49,7 +49,7 @@ pub fn list_players_cmd(_: CommandExecContext) {
 
 pub fn exec_player_action<F>(ctx: CommandExecContext, action_name: &str, action: F)
 where
-    F: FnOnce(mpris::Player) -> Result<(), DBusError>,
+    F: FnOnce(&mpris::Player) -> Result<(), DBusError>,
 {
     let player = match ctx.args.flags.get("player") {
         None => common::get_preferred_player().expect("Failed to get preferred player"),
@@ -60,7 +60,12 @@ where
 
     match player {
         Some(player) => {
-            action(player).expect(format!("Failed to call action {action_name}").as_str())
+            action(&player).expect(format!("Failed to call action {action_name}").as_str());
+            println!(
+                "Action {action_name} called on player {} ({})",
+                player.identity(),
+                player.bus_name(),
+            );
         }
         None => {
             eprintln!("No player found");
