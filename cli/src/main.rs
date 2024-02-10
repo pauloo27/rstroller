@@ -37,6 +37,11 @@ fn new_app() -> App<'static> {
         &commands::list_players_cmd,
     ))
     .add_command(Command::new(
+        CommandName::SetPreferredPlayer,
+        String::from("set the boot persistent preferred player"),
+        &commands::set_preferred_player_cmd,
+    ))
+    .add_command(Command::new(
         CommandName::Play,
         String::from(r#"send the "play" command to the preferred player"#),
         &commands::play_cmd,

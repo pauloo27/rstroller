@@ -13,6 +13,7 @@ pub mod commands;
 pub enum CommandName {
     Help,
     ListPlayers,
+    SetPreferredPlayer,
     Play,
     Pause,
     PlayPause,
@@ -26,6 +27,7 @@ impl CommandName {
         match self {
             CommandName::Help => "help",
             CommandName::ListPlayers => "list-players",
+            CommandName::SetPreferredPlayer => "set-preferred-player",
             CommandName::Play => "play",
             CommandName::Pause => "pause",
             CommandName::PlayPause => "play-pause",
@@ -49,6 +51,7 @@ impl FromStr for CommandName {
             "stop" => Ok(CommandName::Stop),
             "next" => Ok(CommandName::Next),
             "previous" => Ok(CommandName::Previous),
+            "set-preferred-player" => Ok(CommandName::SetPreferredPlayer),
             _ => Err(()),
         }
     }

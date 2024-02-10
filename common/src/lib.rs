@@ -17,6 +17,10 @@ pub fn get_preferred_player_name() -> Result<Option<String>, String> {
     }
 }
 
+pub fn set_preferred_player_name(name: &str) -> Result<(), String> {
+    fs::write(Path::new(PREFERRED_PLAYER_FILE_PATH), name).map_err(|e| e.to_string())
+}
+
 pub fn get_player_by_bus_name(name: &str) -> Result<Option<mpris::Player>, String> {
     let finder = mpris::PlayerFinder::new().map_err(|e| e.to_string())?;
     for player in finder.iter_players().map_err(|e| e.to_string())? {
@@ -44,6 +48,20 @@ pub fn get_preferred_player() -> Result<Option<mpris::Player>, String> {
         return Ok(None);
     }
 
+    Ok(finder
+        .find_all()
+        .map_err(|e| e.to_string())?
+        .into_iter()
+        .next())
+}
+
+pub fn get_preferred_player_or_first() -> Result<Option<mpris::Player>, String> {
+    let preferred_player = get_preferred_player()?;
+    if let Some(preferred_player) = preferred_player {
+        return Ok(Some(preferred_player));
+    }
+
+    let finder = mpris::PlayerFinder::new().map_err(|e| e.to_string())?;
     Ok(finder
         .find_all()
         .map_err(|e| e.to_string())?

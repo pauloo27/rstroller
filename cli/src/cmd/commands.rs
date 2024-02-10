@@ -31,6 +31,22 @@ pub fn previous_cmd(ctx: CommandExecContext) {
     exec_player_action(ctx, "previous", |player| player.previous());
 }
 
+pub fn set_preferred_player_cmd(ctx: CommandExecContext) {
+    let player_name = ctx.args.args.get(2);
+
+    match player_name {
+        None => {
+            eprintln!("Player name not provided");
+            process::exit(1);
+        }
+        Some(player_name) => {
+            common::set_preferred_player_name(&player_name)
+                .expect("Failed to set preferred player name");
+            println!("Preferred player set to {}", player_name);
+        }
+    }
+}
+
 pub fn list_players_cmd(_: CommandExecContext) {
     let preferred_player_name = common::get_preferred_player_name()
         .expect("Failed to get preferred player name")
@@ -60,7 +76,7 @@ where
     F: FnOnce(&mpris::Player) -> Result<(), DBusError>,
 {
     let player = match ctx.args.flags.get("player") {
-        None => common::get_preferred_player().expect("Failed to get preferred player"),
+        None => common::get_preferred_player_or_first().expect("Failed to get preferred player"),
         Some(player_name) => {
             common::get_player_by_bus_name(player_name).expect("Failed to get player")
         }
