@@ -1,6 +1,5 @@
 # To-Do
 
-- `ref` show (PREFERRED) in list-players
 - `command` set-preferred
 - `command` position [+offset/value?]
 - `command` volume [+offset/value?]
@@ -13,6 +12,7 @@
 - `command` raise
 
 # Done
+- `ref` show (PREFERRED) in list-players
 
 # Backlog
 

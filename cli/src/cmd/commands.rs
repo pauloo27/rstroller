@@ -32,6 +32,10 @@ pub fn previous_cmd(ctx: CommandExecContext) {
 }
 
 pub fn list_players_cmd(_: CommandExecContext) {
+    let preferred_player_name = common::get_preferred_player_name()
+        .expect("Failed to get preferred player name")
+        .unwrap_or("".into());
+
     let players = PlayerFinder::new()
         .expect("Failed create PlayerFinder")
         .find_all()
@@ -43,7 +47,11 @@ pub fn list_players_cmd(_: CommandExecContext) {
     }
 
     for player in players {
-        println!("{}: {}", player.identity(), player.bus_name());
+        if player.bus_name() == preferred_player_name {
+            println!("{}: {} (preferred)", player.identity(), player.bus_name());
+        } else {
+            println!("{}: {}", player.identity(), player.bus_name());
+        }
     }
 }
 
