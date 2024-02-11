@@ -1,15 +1,14 @@
 # To-Do
 
-- `core` command usage
-
-# Backlog
-
-- `core` fslisten to preferred player file
-- `bar` waybar
+- `core` fsnotify to preferred player file
+- `waybar` handle player close
 - `gui` simple window with the artist/song name
 - `gui` listen to mpris events
 - `gui` play/pause buttons
 - `gui` prev/next buttons
+
+# Backlog
+
 - `gui` position controller
 - `gui` volume controller
 - `gui` show album

@@ -3,7 +3,7 @@ mod waybar;
 use super::utils;
 use super::CommandExecContext;
 use common;
-use mpris::{DBusError, PlayerFinder, TrackID};
+use mpris::{DBusError, PlayerFinder};
 use std::process;
 use std::time::Duration;
 
@@ -69,13 +69,7 @@ pub fn position_cmd(ctx: CommandExecContext) {
     exec_player_action_silent(&ctx, "position", |player| -> Result<(), DBusError> {
         let metadata = player.get_metadata()?;
 
-        let track_id = metadata
-            .get(&"mpris:trackid")
-            .expect("Track ID not found")
-            .as_str()
-            .expect("Invalid track ID");
-
-        let track_id = TrackID::new(track_id).expect("Invalid track ID");
+        let track_id = metadata.track_id().expect("No track id");
 
         match value {
             Some(value) => {

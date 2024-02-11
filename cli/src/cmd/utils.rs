@@ -24,3 +24,11 @@ pub fn parse_offset(arg: &str) -> Result<f64, String> {
     arg.parse::<f64>()
         .map_err(|e| format!("Failed to parse offset: {}", e))
 }
+
+pub fn truncate_string(s: &str, max_length: usize) -> &str {
+    if s.len() > max_length {
+        &s[..max_length]
+    } else {
+        s
+    }
+}
