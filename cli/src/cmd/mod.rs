@@ -5,10 +5,10 @@ use strum_macros::EnumIter;
 
 mod app;
 mod args;
+pub mod cmds;
 mod utils;
-pub use app::App;
 
-pub mod commands;
+pub use app::App;
 
 #[derive(EnumIter, Hash, Eq, PartialEq, Clone)]
 pub enum CommandName {
@@ -29,6 +29,7 @@ pub enum CommandName {
     Loop,
     Shuffle,
     Show,
+    Waybar,
 }
 
 impl CommandName {
@@ -51,6 +52,7 @@ impl CommandName {
             CommandName::Loop => "loop",
             CommandName::Shuffle => "shuffle",
             CommandName::Show => "show",
+            CommandName::Waybar => "waybar",
         }
     }
 }
@@ -74,6 +76,7 @@ impl FromStr for CommandName {
             "position" => Ok(CommandName::Position),
             "volume" => Ok(CommandName::Volume),
             "metadata" => Ok(CommandName::Metadata),
+            "waybar" => Ok(CommandName::Waybar),
             "loop" => Ok(CommandName::Loop),
             "shuffle" => Ok(CommandName::Shuffle),
             "show" => Ok(CommandName::Show),

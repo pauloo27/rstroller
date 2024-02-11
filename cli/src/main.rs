@@ -1,6 +1,6 @@
 mod cmd;
 
-use cmd::{commands, App, Command, CommandFlag, CommandName};
+use cmd::{cmds, App, Command, CommandFlag, CommandName};
 use once_cell::sync::Lazy;
 
 static PLAYER_FLAG: Lazy<CommandFlag> = Lazy::new(|| {
@@ -29,92 +29,97 @@ fn new_app() -> App<'static> {
     .add_command(Command::new(
         CommandName::Help,
         "show command usage",
-        &commands::help_cmd,
+        &cmds::help_cmd,
     ))
     .add_command(Command::new(
         CommandName::ListPlayers,
         "list available MPRIS players",
-        &commands::list_players_cmd,
+        &cmds::list_players_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::SetPreferredPlayer,
         "<player>",
         "set the preferred player",
-        &commands::set_preferred_player_cmd,
+        &cmds::set_preferred_player_cmd,
     ))
     .add_command(Command::new(
         CommandName::Status,
         "get the playback status of the player",
-        &commands::status_cmd,
+        &cmds::status_cmd,
     ))
     .add_command(Command::new(
         CommandName::Play,
         r#"send the "play" command to the player"#,
-        &commands::play_cmd,
+        &cmds::play_cmd,
     ))
     .add_command(Command::new(
         CommandName::Pause,
         r#"send the "pause" command to the player"#,
-        &commands::pause_cmd,
+        &cmds::pause_cmd,
     ))
     .add_command(Command::new(
         CommandName::PlayPause,
         r#"send the "play/pause" command to the player"#,
-        &commands::play_pause_cmd,
+        &cmds::play_pause_cmd,
     ))
     .add_command(Command::new(
         CommandName::Stop,
         r#"send the "stop" command to the player"#,
-        &commands::stop_cmd,
+        &cmds::stop_cmd,
     ))
     .add_command(Command::new(
         CommandName::Next,
         r#"send the "next" command to the player"#,
-        &commands::next_cmd,
+        &cmds::next_cmd,
     ))
     .add_command(Command::new(
         CommandName::Previous,
         r#"send the "previous" command to the player"#,
-        &commands::previous_cmd,
+        &cmds::previous_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::Metadata,
         "[key]",
         "get all or a specific metadata value from the player",
-        &commands::metadata_cmd,
+        &cmds::metadata_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::Position,
         "[value/offset+]",
         "get or set the playback position IN MILLISECONDS of the player, either as a absolute value (1000) or a relative value (eg: 500- or 1200+)",
-        &commands::position_cmd,
+        &cmds::position_cmd,
     ))
     .add_command(Command::new(
         CommandName::Show,
         "show some information about the player",
-        &commands::show_cmd,
+        &cmds::show_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::Loop,
         "[none/track/playlist]",
         r#"get or set the loop status of the player"#,
-        &commands::loop_cmd,
+        &cmds::loop_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::Shuffle,
         "[true/false]",
         r#"get or set the loop status of the player"#,
-        &commands::shuffle_cmd,
+        &cmds::shuffle_cmd,
     ))
     .add_command(Command::new_with_usage(
         CommandName::Volume,
         "[value/offset+]",
         "get or set the player volume, either as a absolute value (0.5) or a relative value (eg: 0.05- or 0.1+)",
-        &commands::volume_cmd,
+        &cmds::volume_cmd,
     ))
     .add_command(Command::new(
         CommandName::Raise,
         r#"send the "raise" command to the player"#,
-        &commands::raise_cmd,
+        &cmds::raise_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Waybar,
+        "still haven't figured out yet",
+        &cmds::waybar_cmd,
     ))
 }

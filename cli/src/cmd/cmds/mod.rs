@@ -1,3 +1,5 @@
+mod waybar;
+
 use super::utils;
 use super::CommandExecContext;
 use common;
@@ -5,36 +7,38 @@ use mpris::{DBusError, PlayerFinder, TrackID};
 use std::process;
 use std::time::Duration;
 
+pub use waybar::waybar_cmd;
+
 pub fn help_cmd(ctx: CommandExecContext) {
     ctx.app.help();
 }
 
 pub fn play_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "play", |player| player.play());
+    exec_player_action(&ctx, "play", |player| player.play());
 }
 
 pub fn pause_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "pause", |player| player.pause());
+    exec_player_action(&ctx, "pause", |player| player.pause());
 }
 
 pub fn raise_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "raise", |player| player.raise());
+    exec_player_action(&ctx, "raise", |player| player.raise());
 }
 
 pub fn play_pause_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "play/pause", |player| player.play_pause());
+    exec_player_action(&ctx, "play/pause", |player| player.play_pause());
 }
 
 pub fn stop_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "stop", |player| player.stop());
+    exec_player_action(&ctx, "stop", |player| player.stop());
 }
 
 pub fn next_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "next", |player| player.next());
+    exec_player_action(&ctx, "next", |player| player.next());
 }
 
 pub fn previous_cmd(ctx: CommandExecContext) {
-    exec_player_action(ctx, "previous", |player| player.previous());
+    exec_player_action(&ctx, "previous", |player| player.previous());
 }
 
 pub fn metadata_cmd(ctx: CommandExecContext) {
@@ -220,7 +224,7 @@ pub fn list_players_cmd(_: CommandExecContext) {
     }
 }
 
-pub fn exec_player_action<F>(ctx: CommandExecContext, action_name: &str, action: F)
+pub fn exec_player_action<F>(ctx: &CommandExecContext, action_name: &str, action: F)
 where
     F: FnOnce(&mpris::Player) -> Result<(), DBusError>,
 {
