@@ -28,62 +28,87 @@ fn new_app() -> App<'static> {
     .add_flag(&PLAYER_FLAG)
     .add_command(Command::new(
         CommandName::Help,
-        String::from("show command usage"),
+        "show command usage",
         &commands::help_cmd,
     ))
     .add_command(Command::new(
         CommandName::ListPlayers,
-        String::from("list available MPRIS players"),
+        "list available MPRIS players",
         &commands::list_players_cmd,
     ))
     .add_command(Command::new(
         CommandName::SetPreferredPlayer,
-        String::from("set the boot persistent preferred player"),
+        "set the preferred player",
         &commands::set_preferred_player_cmd,
     ))
     .add_command(Command::new(
         CommandName::Status,
-        String::from("return the playback status of the preferred player"),
+        "return the playback status of the player",
         &commands::status_cmd,
     ))
     .add_command(Command::new(
         CommandName::Play,
-        String::from(r#"send the "play" command to the preferred player"#),
+        r#"send the "play" command to the player"#,
         &commands::play_cmd,
     ))
     .add_command(Command::new(
         CommandName::Pause,
-        String::from(r#"send the "pause" command to the preferred player"#),
+        r#"send the "pause" command to the player"#,
         &commands::pause_cmd,
     ))
     .add_command(Command::new(
         CommandName::PlayPause,
-        String::from(r#"send the "play/pause" command to the preferred player"#),
+        r#"send the "play/pause" command to the player"#,
         &commands::play_pause_cmd,
     ))
     .add_command(Command::new(
         CommandName::Stop,
-        String::from(r#"send the "stop" command to the preferred player"#),
+        r#"send the "stop" command to the player"#,
         &commands::stop_cmd,
     ))
     .add_command(Command::new(
         CommandName::Next,
-        String::from(r#"send the "next" command to the preferred player"#),
+        r#"send the "next" command to the player"#,
         &commands::next_cmd,
     ))
     .add_command(Command::new(
         CommandName::Previous,
-        String::from(r#"send the "previous" command to the preferred player"#),
+        r#"send the "previous" command to the player"#,
         &commands::previous_cmd,
     ))
     .add_command(Command::new(
+        CommandName::Metadata,
+        "get all or a specific metadata value from the player",
+        &commands::metadata_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Position,
+        "get or set the playback position IN MILLISECONDS of the player, either as a absolute value (1000) or a relative value (eg: 500- or 1200+)",
+        &commands::position_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Show,
+        "show some information about the player",
+        &commands::show_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Loop,
+        r#"get or set the loop status of the player, can be "none", "track" or "playlist""#,
+        &commands::loop_cmd,
+    ))
+    .add_command(Command::new(
+        CommandName::Shuffle,
+        r#"get or set the loop status of the player, can be "true" or "false""#,
+        &commands::shuffle_cmd,
+    ))
+    .add_command(Command::new(
         CommandName::Volume,
-        String::from("get or set the player volume, either as a absolute value (0.5) or a relative value (eg: 0.05- or 0.1+)"),
+        "get or set the player volume, either as a absolute value (0.5) or a relative value (eg: 0.05- or 0.1+)",
         &commands::volume_cmd,
     ))
     .add_command(Command::new(
         CommandName::Raise,
-        String::from(r#"send the "raise" command to the preferred player"#),
+        r#"send the "raise" command to the player"#,
         &commands::raise_cmd,
     ))
 }

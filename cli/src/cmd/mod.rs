@@ -5,6 +5,7 @@ use strum_macros::EnumIter;
 
 mod app;
 mod args;
+mod utils;
 pub use app::App;
 
 pub mod commands;
@@ -23,6 +24,11 @@ pub enum CommandName {
     Previous,
     Raise,
     Volume,
+    Metadata,
+    Position,
+    Loop,
+    Shuffle,
+    Show,
 }
 
 impl CommandName {
@@ -40,6 +46,11 @@ impl CommandName {
             CommandName::Previous => "previous",
             CommandName::Raise => "raise",
             CommandName::Volume => "volume",
+            CommandName::Metadata => "metadata",
+            CommandName::Position => "position",
+            CommandName::Loop => "loop",
+            CommandName::Shuffle => "shuffle",
+            CommandName::Show => "show",
         }
     }
 }
@@ -60,7 +71,12 @@ impl FromStr for CommandName {
             "previous" => Ok(CommandName::Previous),
             "set-preferred-player" => Ok(CommandName::SetPreferredPlayer),
             "raise" => Ok(CommandName::Raise),
+            "position" => Ok(CommandName::Position),
             "volume" => Ok(CommandName::Volume),
+            "metadata" => Ok(CommandName::Metadata),
+            "loop" => Ok(CommandName::Loop),
+            "shuffle" => Ok(CommandName::Shuffle),
+            "show" => Ok(CommandName::Show),
             _ => Err(()),
         }
     }
@@ -136,16 +152,16 @@ impl CommandFlag {
 
 pub struct Command<'a> {
     pub name: CommandName,
-    pub description: String,
+    pub description: &'a str,
     pub handler: &'a dyn Fn(CommandExecContext),
 }
 
 impl<'a> Command<'a> {
     pub fn new(
         name: CommandName,
-        description: String,
-        handler: &dyn Fn(CommandExecContext),
-    ) -> Command {
+        description: &'a str,
+        handler: &'a dyn Fn(CommandExecContext),
+    ) -> Command<'a> {
         Command {
             name,
             description,
