@@ -36,14 +36,15 @@ fn new_app() -> App<'static> {
         "list available MPRIS players",
         &commands::list_players_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::SetPreferredPlayer,
+        "<player>",
         "set the preferred player",
         &commands::set_preferred_player_cmd,
     ))
     .add_command(Command::new(
         CommandName::Status,
-        "return the playback status of the player",
+        "get the playback status of the player",
         &commands::status_cmd,
     ))
     .add_command(Command::new(
@@ -76,13 +77,15 @@ fn new_app() -> App<'static> {
         r#"send the "previous" command to the player"#,
         &commands::previous_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::Metadata,
+        "[key]",
         "get all or a specific metadata value from the player",
         &commands::metadata_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::Position,
+        "[value/offset+]",
         "get or set the playback position IN MILLISECONDS of the player, either as a absolute value (1000) or a relative value (eg: 500- or 1200+)",
         &commands::position_cmd,
     ))
@@ -91,18 +94,21 @@ fn new_app() -> App<'static> {
         "show some information about the player",
         &commands::show_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::Loop,
-        r#"get or set the loop status of the player, can be "none", "track" or "playlist""#,
+        "[none/track/playlist]",
+        r#"get or set the loop status of the player"#,
         &commands::loop_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::Shuffle,
-        r#"get or set the loop status of the player, can be "true" or "false""#,
+        "[true/false]",
+        r#"get or set the loop status of the player"#,
         &commands::shuffle_cmd,
     ))
-    .add_command(Command::new(
+    .add_command(Command::new_with_usage(
         CommandName::Volume,
+        "[value/offset+]",
         "get or set the player volume, either as a absolute value (0.5) or a relative value (eg: 0.05- or 0.1+)",
         &commands::volume_cmd,
     ))

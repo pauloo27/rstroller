@@ -153,6 +153,7 @@ impl CommandFlag {
 pub struct Command<'a> {
     pub name: CommandName,
     pub description: &'a str,
+    pub usage: &'a str,
     pub handler: &'a dyn Fn(CommandExecContext),
 }
 
@@ -164,6 +165,21 @@ impl<'a> Command<'a> {
     ) -> Command<'a> {
         Command {
             name,
+            usage: "",
+            description,
+            handler,
+        }
+    }
+
+    pub fn new_with_usage(
+        name: CommandName,
+        usage: &'a str,
+        description: &'a str,
+        handler: &'a dyn Fn(CommandExecContext),
+    ) -> Command<'a> {
+        Command {
+            name,
+            usage,
             description,
             handler,
         }

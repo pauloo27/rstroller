@@ -75,7 +75,11 @@ impl<'a> App<'a> {
         println!();
         println!("Commands:");
         for (_, cmd) in &self.commands {
-            println!("  {} - {}", cmd.name, cmd.description);
+            if cmd.usage.is_empty() {
+                println!("  {} - {}", cmd.name, cmd.description);
+            } else {
+                println!("  {} {} - {}", cmd.name, cmd.usage, cmd.description);
+            }
         }
     }
 }
