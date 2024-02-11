@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 mpris = "2.0.1"
+anyhow = "1.0"
+itertools = "0.12"
+
