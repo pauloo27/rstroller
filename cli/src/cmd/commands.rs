@@ -39,7 +39,7 @@ pub fn previous_cmd(ctx: CommandExecContext) {
 
 pub fn metadata_cmd(ctx: CommandExecContext) {
     exec_player_action_silent(&ctx, "metadata", |player| {
-        let metadata_key = ctx.args.args.get(2);
+        let metadata_key = ctx.args.get(2);
 
         let metadata = player.get_metadata()?;
 
@@ -60,7 +60,7 @@ pub fn metadata_cmd(ctx: CommandExecContext) {
 }
 
 pub fn position_cmd(ctx: CommandExecContext) {
-    let value = ctx.args.args.get(2);
+    let value = ctx.args.get(2);
 
     exec_player_action_silent(&ctx, "position", |player| -> Result<(), DBusError> {
         let metadata = player.get_metadata()?;
@@ -115,7 +115,7 @@ pub fn show_cmd(ctx: CommandExecContext) {
 
 pub fn loop_cmd(ctx: CommandExecContext) {
     exec_player_action_silent(&ctx, "loop", |player| {
-        let value = ctx.args.args.get(2);
+        let value = ctx.args.get(2);
 
         match value {
             Some(v) => match v.to_lowercase().as_str() {
@@ -134,7 +134,7 @@ pub fn loop_cmd(ctx: CommandExecContext) {
 
 pub fn shuffle_cmd(ctx: CommandExecContext) {
     exec_player_action_silent(&ctx, "shuffle", |player| {
-        let value = ctx.args.args.get(2);
+        let value = ctx.args.get(2);
 
         match value {
             Some(v) => match v.to_lowercase().as_str() {
@@ -151,7 +151,7 @@ pub fn shuffle_cmd(ctx: CommandExecContext) {
 }
 
 pub fn set_preferred_player_cmd(ctx: CommandExecContext) {
-    let player_name = ctx.args.args.get(2);
+    let player_name = ctx.args.get(2);
 
     match player_name {
         None => {
@@ -167,7 +167,7 @@ pub fn set_preferred_player_cmd(ctx: CommandExecContext) {
 }
 
 pub fn volume_cmd(ctx: CommandExecContext) {
-    let value = ctx.args.args.get(2);
+    let value = ctx.args.get(2);
 
     exec_player_action_silent(&ctx, "volume", |player| -> Result<(), DBusError> {
         match value {
