@@ -1,9 +1,9 @@
-use std::{fs, io};
 use std::path::Path;
+use std::{fs, io};
 
-use itertools::Itertools;
-use anyhow::Result as AnyResult;
 use anyhow::Context;
+use anyhow::Result as AnyResult;
+use itertools::Itertools;
 use mpris::{Player, PlayerFinder};
 
 const PREFERRED_PLAYER_FILE_PATH: &'static str = "/dev/shm/rstroller-player";
@@ -32,7 +32,7 @@ pub fn get_preferred_player_name() -> AnyResult<Option<String>> {
 /// Writes the name to the preferred player file.
 ///
 /// # Errors
-/// 
+///
 /// Propagates [fs::write] with [anyhow].
 ///
 pub fn set_preferred_player_name(name: &str) -> AnyResult<()> {
@@ -56,12 +56,11 @@ pub fn get_player_by_bus_name(name: &str) -> AnyResult<Option<Player>> {
     let finder = PlayerFinder::new()?;
 
     // Finds the first player with the requested bus name
-    Ok(finder.iter_players()?
+    Ok(finder
+        .iter_players()?
         // Processes this iterator of results as if it was an iterator of the
         // Ok values. If an error is found, it's returned.
-        .process_results(
-            |mut i| i.find(|p| p.bus_name() == name)
-        )?)
+        .process_results(|mut i| i.find(|p| p.bus_name() == name))?)
 }
 
 /// Gets the first player it can find
@@ -76,13 +75,8 @@ pub fn get_player_by_bus_name(name: &str) -> AnyResult<Option<Player>> {
 pub fn get_first_player() -> AnyResult<Option<Player>> {
     let finder = PlayerFinder::new()?;
 
-    // QUESTION: shouldn't .iter_players()?.next()? be the same? If so, it has
-    // the advantage of being lazy and not creating a Vec of Players just to
-    // take out the first one.
-    Ok(finder
-        .find_all()?
-        .into_iter()
-        .next())
+    // QUESTION: which bear is best? well, there's basically two schools of thought
+    Ok(finder.find_all()?.into_iter().next())
 }
 
 /// Gets the preferred player from the file.
@@ -99,8 +93,8 @@ pub fn get_first_player() -> AnyResult<Option<Player>> {
 /// problem with DBus happened the error is propagated with [anyhow].
 ///
 pub fn get_preferred_player() -> AnyResult<Option<Player>> {
-    let name = get_preferred_player_name()
-        .context("couldn't get the name of the preferred player")?;
+    let name =
+        get_preferred_player_name().context("couldn't get the name of the preferred player")?;
 
     match name {
         Some(name) => get_player_by_bus_name(&name),
@@ -128,4 +122,3 @@ pub fn get_preferred_player_or_first() -> AnyResult<Option<Player>> {
         x => x,
     }
 }
-
