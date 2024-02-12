@@ -1,14 +1,6 @@
-use args::ParsedArgs;
 use std::fmt::Display;
 use std::str::FromStr;
 use strum_macros::EnumIter;
-
-mod app;
-mod args;
-pub mod cmds;
-mod utils;
-
-pub use app::App;
 
 #[derive(EnumIter, Hash, Eq, PartialEq, Clone)]
 pub enum CommandName {
@@ -121,70 +113,5 @@ mod tests {
 impl Display for CommandName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value())
-    }
-}
-
-pub struct CommandExecContext<'a> {
-    app: &'a App<'a>,
-    args: ParsedArgs,
-}
-
-#[derive(Debug)]
-pub struct CommandFlag {
-    pub name: &'static str,
-    pub short_name: Option<&'static str>,
-    pub description: &'static str,
-    pub has_value: bool,
-}
-
-impl CommandFlag {
-    pub fn new(
-        name: &'static str,
-        short_name: Option<&'static str>,
-        description: &'static str,
-        has_value: bool,
-    ) -> Self {
-        CommandFlag {
-            name,
-            short_name,
-            description,
-            has_value,
-        }
-    }
-}
-
-pub struct Command<'a> {
-    pub name: CommandName,
-    pub description: &'a str,
-    pub usage: &'a str,
-    pub handler: &'a dyn Fn(CommandExecContext),
-}
-
-impl<'a> Command<'a> {
-    pub fn new(
-        name: CommandName,
-        description: &'a str,
-        handler: &'a dyn Fn(CommandExecContext),
-    ) -> Command<'a> {
-        Command {
-            name,
-            usage: "",
-            description,
-            handler,
-        }
-    }
-
-    pub fn new_with_usage(
-        name: CommandName,
-        usage: &'a str,
-        description: &'a str,
-        handler: &'a dyn Fn(CommandExecContext),
-    ) -> Command<'a> {
-        Command {
-            name,
-            usage,
-            description,
-            handler,
-        }
     }
 }

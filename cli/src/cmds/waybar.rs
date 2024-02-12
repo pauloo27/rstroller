@@ -1,12 +1,12 @@
 use super::utils;
-use crate::cmd::CommandExecContext;
+use super::utils::exec_player_action_silent;
+use super::CommandName;
+use crate::core::CommandExecContext;
 use mpris::DBusError;
 use serde_json::json;
 
-use super::exec_player_action_silent;
-
-pub fn waybar_cmd(ctx: CommandExecContext) {
-    exec_player_action_silent(&ctx, "waybar", |player| {
+pub fn waybar_cmd(ctx: CommandExecContext<CommandName>) {
+    exec_player_action_silent(&ctx, "polybar", |player| {
         let events = player.events()?;
 
         show(&player)?;

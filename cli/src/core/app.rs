@@ -1,17 +1,24 @@
 use super::args;
-use super::{Command, CommandExecContext, CommandFlag, CommandName};
+use super::CommandNameConstraints;
+use super::{Command, CommandExecContext, CommandFlag};
 use std::collections::HashMap;
 use std::process;
 
-pub struct App<'a> {
+pub struct App<'a, CommandName>
+where
+    CommandName: CommandNameConstraints,
+{
     pub name: String,
     pub description: String,
-    pub commands: HashMap<CommandName, Command<'a>>,
+    pub commands: HashMap<CommandName, Command<'a, CommandName>>,
     pub flags: Vec<&'a CommandFlag>,
     pub arg_parser: args::ArgParser,
 }
 
-impl<'a> App<'a> {
+impl<'a, CommandName> App<'a, CommandName>
+where
+    CommandName: CommandNameConstraints,
+{
     pub fn new(name: String, description: String) -> Self {
         App {
             name,
@@ -28,7 +35,7 @@ impl<'a> App<'a> {
         self
     }
 
-    pub fn add_command(mut self, cmd: Command<'a>) -> Self {
+    pub fn add_command(mut self, cmd: Command<'a, CommandName>) -> Self {
         self.commands.insert(cmd.name.clone(), cmd);
         self
     }
