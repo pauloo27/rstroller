@@ -1,6 +1,8 @@
 mod cmd;
+mod cmds;
 
-use cmd::{cmds, App, Command, CommandFlag, CommandName};
+use cmd::{App, Command, CommandFlag};
+use cmds::CommandName;
 use once_cell::sync::Lazy;
 
 static PLAYER_FLAG: Lazy<CommandFlag> = Lazy::new(|| {
@@ -20,7 +22,7 @@ fn main() {
     }
 }
 
-fn new_app() -> App<'static> {
+fn new_app() -> App<'static, CommandName> {
     App::new(
         String::from("rstroller"),
         String::from("player controller for MPRIS"),

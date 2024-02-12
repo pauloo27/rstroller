@@ -1,9 +1,10 @@
 use crate::cmd::CommandExecContext;
 use mpris::DBusError;
+use super::CommandName;
 
-use super::exec_player_action_silent;
+use super::utils::exec_player_action_silent;
 
-pub fn waybar_cmd(ctx: CommandExecContext) {
+pub fn waybar_cmd(ctx: CommandExecContext<CommandName>) {
     exec_player_action_silent(&ctx, "polybar", |player| {
         let events = player.events()?;
 
