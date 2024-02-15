@@ -156,7 +156,7 @@ pub fn set_preferred_player_cmd(ctx: CommandExecContext<CommandName>) {
             process::exit(1);
         }
         Some(player_name) => {
-            common::set_preferred_player_name(&player_name)
+            common::player::set_preferred_player_name(&player_name)
                 .expect("Failed to set preferred player name");
             println!("Preferred player set to {}", player_name);
         }
@@ -194,7 +194,7 @@ pub fn status_cmd(ctx: CommandExecContext<CommandName>) {
 }
 
 pub fn list_players_cmd(_: CommandExecContext<CommandName>) {
-    let preferred_player_name = common::get_preferred_player_name()
+    let preferred_player_name = common::player::get_preferred_player_name()
         .expect("Failed to get preferred player name")
         .unwrap_or("".into());
 

@@ -3,7 +3,7 @@ use std::{process, thread};
 
 pub fn spawn_mpris_listener(sender: async_channel::Sender<PlayerState>) {
     thread::spawn(move || {
-        let player = match common::get_preferred_player_or_first() {
+        let player = match common::player::get_preferred_player_or_first() {
             Ok(Some(player)) => player,
             Ok(None) => {
                 eprintln!("Player not found");

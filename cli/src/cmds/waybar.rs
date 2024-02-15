@@ -1,4 +1,3 @@
-use super::utils;
 use super::utils::exec_player_action_silent;
 use super::CommandName;
 use crate::core::CommandExecContext;
@@ -36,8 +35,8 @@ fn show(player: &mpris::Player) -> Result<(), DBusError> {
             format!(
                 "{} {} by {}",
                 icon,
-                utils::truncate_string(title, 40),
-                utils::truncate_string(&artist.join(", "), 20),
+                common::utils::truncate_string(title, 40),
+                common::utils::truncate_string(&artist.join(", "), 20),
             ),
             format!(
                 "{} by {}{}",
@@ -50,7 +49,7 @@ fn show(player: &mpris::Player) -> Result<(), DBusError> {
             ),
         ),
         None => (
-            format!("{} {}", icon, utils::truncate_string(title, 40)),
+            format!("{} {}", icon, common::utils::truncate_string(title, 40)),
             format!("{}", title),
         ),
     };

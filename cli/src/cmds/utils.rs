@@ -51,9 +51,11 @@ pub fn exec_player_action_silent<F>(
     F: FnOnce(&mpris::Player) -> Result<(), DBusError>,
 {
     let player = match ctx.args.flags.get("player") {
-        None => common::get_preferred_player_or_first().expect("Failed to get preferred player"),
+        None => {
+            common::player::get_preferred_player_or_first().expect("Failed to get preferred player")
+        }
         Some(player_name) => {
-            common::get_player_by_bus_name(player_name).expect("Failed to get player")
+            common::player::get_player_by_bus_name(player_name).expect("Failed to get player")
         }
     };
 
@@ -65,13 +67,5 @@ pub fn exec_player_action_silent<F>(
             eprintln!("No player found");
             process::exit(1);
         }
-    }
-}
-
-pub fn truncate_string(s: &str, max_length: usize) -> &str {
-    if s.len() > max_length {
-        &s[..max_length]
-    } else {
-        s
     }
 }
