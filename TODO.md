@@ -2,8 +2,6 @@
 
 - `core` fsnotify to preferred player file
 - `waybar` handle player close
-- `gui` simple window with the artist/song name
-- `gui` listen to mpris events
 - `gui` play/pause buttons
 - `gui` prev/next buttons
 
