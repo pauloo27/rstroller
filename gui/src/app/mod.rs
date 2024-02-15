@@ -12,7 +12,7 @@ pub use player_state::PlayerState;
 
 const APP_ID: &str = "cafe.ndo.Rstroller";
 
-type MprisListener = dyn Fn(Rc<PlayerState>);
+type MprisListener = dyn Fn(&PlayerState);
 
 pub struct App {
     gtk_app: gtk::Application,
@@ -31,7 +31,7 @@ impl App {
     }
 
     pub fn run(self: Rc<Self>) -> i32 {
-        self.gtk_app.connect_startup(|_| Self::load_css());
+        self.gtk_app.connect_startup(|_| Self::load_global_css());
         self.gtk_app
             .connect_activate(clone!(@weak self as app => move |_| {
                 app.setup_ui();
@@ -43,20 +43,21 @@ impl App {
 
     pub fn add_listener<F>(&self, listener: F)
     where
-        F: Fn(Rc<PlayerState>) + 'static,
+        F: Fn(&PlayerState) + 'static,
     {
         self.listeners.borrow_mut().push(Box::new(listener));
     }
 
-    fn emit_player_state(&self, metadata: Rc<PlayerState>) {
+    fn emit_player_state(&self, state: PlayerState) {
         for listener in self.listeners.borrow().iter() {
-            listener(metadata.clone());
+            listener(&state);
         }
     }
 }
 
+// internal implementation
 impl App {
-    fn load_css() {
+    fn load_global_css() {
         let provider = gtk::CssProvider::new();
         provider.load_from_data(include_str!("ui/style.css"));
 
@@ -97,8 +98,8 @@ impl App {
         mpris_listener::spawn_mpris_listener(sender);
 
         glib::spawn_future_local(clone!(@weak self as app => async move {
-            while let Ok(metadata) = receiver.recv().await {
-                app.emit_player_state(Rc::new(metadata));
+            while let Ok(state) = receiver.recv().await {
+                app.emit_player_state(state);
             }
         }));
     }
