@@ -1,4 +1,5 @@
 mod mpris_listener;
+mod player_state;
 mod track_info;
 
 use std::{cell::RefCell, rc::Rc};
@@ -7,9 +8,11 @@ use gtk::glib::{self, clone};
 use gtk::prelude::*;
 use gtk4 as gtk;
 
+pub use player_state::PlayerState;
+
 const APP_ID: &str = "cafe.ndo.Rstroller";
 
-type MprisListener = dyn Fn(Rc<mpris::Metadata>);
+type MprisListener = dyn Fn(Rc<PlayerState>);
 
 pub struct App {
     gtk_app: gtk::Application,
@@ -29,33 +32,25 @@ impl App {
 
     pub fn run(self: Rc<Self>) -> i32 {
         self.gtk_app
-            .connect_activate(clone!(@weak self as app => move |_| app.setup_ui()));
+            .connect_activate(clone!(@weak self as app => move |_| {
+                app.setup_ui();
+                app.listen_to_mpris();
+            }));
+
         self.gtk_app.run().value()
     }
 
     pub fn add_listener<F>(&self, listener: F)
     where
-        F: Fn(Rc<mpris::Metadata>) + 'static,
+        F: Fn(Rc<PlayerState>) + 'static,
     {
         self.listeners.borrow_mut().push(Box::new(listener));
     }
 
-    pub fn emit_metadata(&self, metadata: Rc<mpris::Metadata>) {
+    fn emit_player_state(&self, metadata: Rc<PlayerState>) {
         for listener in self.listeners.borrow().iter() {
             listener(metadata.clone());
         }
-    }
-
-    pub fn listen_to_mpris(self: Rc<Self>) {
-        let (sender, receiver) = async_channel::bounded(1);
-
-        mpris_listener::spawn_mpris_listener(sender);
-
-        glib::spawn_future_local(clone!(@weak self as app => async move {
-            while let Ok(metadata) = receiver.recv().await {
-                app.emit_metadata(Rc::new(metadata));
-            }
-        }));
     }
 }
 
@@ -79,23 +74,20 @@ impl App {
 
         container.append(&track_info::new(&self));
 
-        self.emit_initial_metadata();
-
         window.set_child(Some(&container));
 
         window.present();
     }
 
-    fn emit_initial_metadata(&self) {
-        let metadata = common::get_preferred_player_or_first()
-            .expect("No players found")
-            .unwrap_or_else(|| {
-                eprintln!("No players found");
-                std::process::exit(1);
-            })
-            .get_metadata()
-            .expect("Failed to get metadata");
+    fn listen_to_mpris(self: Rc<Self>) {
+        let (sender, receiver) = async_channel::bounded(1);
 
-        self.emit_metadata(Rc::new(metadata));
+        mpris_listener::spawn_mpris_listener(sender);
+
+        glib::spawn_future_local(clone!(@weak self as app => async move {
+            while let Ok(metadata) = receiver.recv().await {
+                app.emit_player_state(Rc::new(metadata));
+            }
+        }));
     }
 }

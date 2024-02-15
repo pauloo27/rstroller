@@ -1,6 +1,7 @@
+use super::PlayerState;
 use std::{process, thread};
 
-pub fn spawn_mpris_listener(sender: async_channel::Sender<mpris::Metadata>) {
+pub fn spawn_mpris_listener(sender: async_channel::Sender<PlayerState>) {
     thread::spawn(move || {
         let player = match common::get_preferred_player_or_first() {
             Ok(Some(player)) => player,
@@ -19,10 +20,18 @@ pub fn spawn_mpris_listener(sender: async_channel::Sender<mpris::Metadata>) {
             process::exit(1);
         });
 
-        for _ in events {
-            let metadata = player.get_metadata();
+        let mut last_player_state = PlayerState::new(&player);
+
+        // send initial player state
+        sender
+            .send_blocking(last_player_state.clone())
+            .expect("Failed to send metadata");
+
+        for event in events {
+            last_player_state =
+                last_player_state.handle_event(event.expect("Failed to read mpris event"));
             sender
-                .send_blocking(metadata.expect("Failed to get metadata"))
+                .send_blocking(last_player_state.clone())
                 .expect("Failed to send metadata");
         }
     });
