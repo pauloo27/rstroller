@@ -9,8 +9,8 @@ pub fn new(app: &App) -> gtk::Box {
         .orientation(gtk::Orientation::Vertical)
         .build();
 
-    let title_lbl = gtk::Label::new(None);
-    let artist_lbl = gtk::Label::new(None);
+    let title_lbl = gtk::Label::builder().css_name("track-title-label").build();
+    let artist_lbl = gtk::Label::builder().css_name("track-artist-label").build();
 
     container.append(&title_lbl);
     container.append(&artist_lbl);

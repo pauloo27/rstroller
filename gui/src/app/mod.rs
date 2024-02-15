@@ -31,6 +31,7 @@ impl App {
     }
 
     pub fn run(self: Rc<Self>) -> i32 {
+        self.gtk_app.connect_startup(|_| Self::load_css());
         self.gtk_app
             .connect_activate(clone!(@weak self as app => move |_| {
                 app.setup_ui();
@@ -55,6 +56,17 @@ impl App {
 }
 
 impl App {
+    fn load_css() {
+        let provider = gtk::CssProvider::new();
+        provider.load_from_data(include_str!("style.css"));
+
+        gtk::style_context_add_provider_for_display(
+            &gtk::gdk::Display::default().expect("Could not connect to a display."),
+            &provider,
+            gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+        );
+    }
+
     fn setup_ui(&self) {
         let window = gtk::ApplicationWindow::builder()
             .application(&self.gtk_app)
