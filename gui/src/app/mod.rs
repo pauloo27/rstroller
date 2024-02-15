@@ -1,6 +1,6 @@
 mod mpris_listener;
 mod player_state;
-mod track_info;
+mod ui;
 
 use std::{cell::RefCell, rc::Rc};
 
@@ -58,7 +58,7 @@ impl App {
 impl App {
     fn load_css() {
         let provider = gtk::CssProvider::new();
-        provider.load_from_data(include_str!("style.css"));
+        provider.load_from_data(include_str!("ui/style.css"));
 
         gtk::style_context_add_provider_for_display(
             &gtk::gdk::Display::default().expect("Could not connect to a display."),
@@ -84,7 +84,7 @@ impl App {
             .margin_end(10)
             .build();
 
-        container.append(&track_info::new(&self));
+        container.append(&ui::track_info::new(&self));
 
         window.set_child(Some(&container));
 

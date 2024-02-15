@@ -1,4 +1,4 @@
-use super::App;
+use super::super::App;
 use glib::clone;
 use gtk::glib;
 use gtk::prelude::*;
