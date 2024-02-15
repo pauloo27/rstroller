@@ -13,7 +13,7 @@ type MprisListener = dyn Fn(Rc<mpris::Metadata>);
 
 pub struct App {
     gtk_app: gtk::Application,
-    listeners: Rc<RefCell<Vec<Box<MprisListener>>>>,
+    listeners: Rc<RefCell<Vec<Box<MprisListener /*---[*/>>>>,
 }
 
 // public interface
