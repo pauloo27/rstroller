@@ -16,7 +16,7 @@ type MprisListener = dyn Fn(&PlayerState);
 
 pub struct App {
     gtk_app: gtk::Application,
-    listeners: Rc<RefCell<Vec<Box<MprisListener /*---[*/>>>>,
+    listeners: RefCell<Vec<Box<MprisListener /*---[*/>>>,
 }
 
 // public interface
@@ -26,7 +26,7 @@ impl App {
 
         App {
             gtk_app,
-            listeners: Rc::new(RefCell::new(Vec::new())),
+            listeners: RefCell::new(Vec::new()),
         }
     }
 
