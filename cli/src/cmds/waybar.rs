@@ -34,7 +34,11 @@ fn handle_player(player: &mpris::Player) {
     show(player).expect("Failed to show player");
 
     for event in player.events().expect("Failed to get events") {
-        match event.expect("Failed to get event") {
+        if event.is_err() {
+            break;
+        }
+        let event = event.unwrap();
+        match event {
             Event::TrackChanged(_) | Event::Playing | Event::Paused | Event::Stopped => {
                 show(player).expect("Failed to show player")
             }
