@@ -5,7 +5,7 @@ use mpris::DBusError;
 use serde_json::json;
 
 pub fn waybar_cmd(ctx: CommandExecContext<CommandName>) {
-    exec_player_action_silent(&ctx, "polybar", |player| {
+    exec_player_action_silent(&ctx, "waybar", |player| {
         let events = player.events()?;
 
         show(&player)?;
