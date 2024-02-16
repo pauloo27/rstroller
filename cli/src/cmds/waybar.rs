@@ -54,7 +54,7 @@ fn handle_player(player: &mpris::Player) {
 fn show(player: &mpris::Player) -> Result<(), DBusError> {
     let metadata = player.get_metadata()?;
     let title = metadata.title().expect("title not found");
-    let artist = metadata.artists();
+    let artists = parse_artists(metadata.artists());
     let album = metadata.album_name();
 
     let icon = match player.get_playback_status()? {
@@ -63,21 +63,21 @@ fn show(player: &mpris::Player) -> Result<(), DBusError> {
         mpris::PlaybackStatus::Stopped => "",
     };
 
-    let (line, tooltip) = match artist {
-        Some(artist) => (
+    let (line, tooltip) = match artists {
+        Some(artists) => (
             format!(
                 "{} {} by {}",
                 icon,
                 common::utils::truncate_string(title, 40),
-                common::utils::truncate_string(&artist.join(", "), 20),
+                common::utils::truncate_string(&artists, 20),
             ),
             format!(
                 "{} by {}{}",
                 title,
-                &artist.join(", "),
+                artists,
                 match album {
-                    None => "".to_string(),
-                    Some(album) => format!("from the album {}", album),
+                    Some(album) if !album.is_empty() => format!("from the album {}", album),
+                    _ => "".to_string(),
                 }
             ),
         ),
@@ -95,4 +95,22 @@ fn show(player: &mpris::Player) -> Result<(), DBusError> {
     println!("{}", output.to_string());
 
     Ok(())
+}
+
+fn parse_artists(artists: Option<Vec<&str>>) -> Option<String> {
+    match artists {
+        Some(artists) => {
+            if artists.is_empty() {
+                return None;
+            }
+            let joined_artists = artists.join(", ");
+
+            if joined_artists == "" {
+                return None;
+            }
+
+            Some(joined_artists)
+        }
+        None => None,
+    }
 }
