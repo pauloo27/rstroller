@@ -1,7 +1,6 @@
 # To-Do
 
 - `core` fsnotify to preferred player file
-- `waybar` handle player close
 - `gui` play/pause buttons
 - `gui` prev/next buttons
 
