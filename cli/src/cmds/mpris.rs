@@ -1,5 +1,5 @@
 use super::utils::{
-    exec_player_action, exec_player_action_silent, format_metadata_value, parse_offset,
+    exec_player_action, exec_player_action_silent, format_metadata_value, parse_offset, print_if_ok,
 };
 use super::CommandName;
 use crate::core::CommandExecContext;
@@ -98,8 +98,8 @@ pub fn show_cmd(ctx: CommandExecContext<CommandName>) {
     exec_player_action_silent(&ctx, "show", |player| {
         println!("{} ({})", player.identity(), player.bus_name());
         println!("Playback status: {:?}", player.get_playback_status()?);
-        println!("Volume: {}", player.get_volume()?);
-        println!("Position: {}", player.get_position()?.as_millis());
+        print_if_ok("Volume", player.get_volume());
+        print_if_ok("Position", player.get_position());
         let metadata = player.get_metadata()?;
 
         println!("Metadata:");
