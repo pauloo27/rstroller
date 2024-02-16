@@ -1,5 +1,5 @@
 use super::CommandName;
-use crate::core::CommandExecContext;
+use crate::core_definition::CommandExecContext;
 use mpris::{DBusError, Event};
 use serde_json::json;
 use std::process;

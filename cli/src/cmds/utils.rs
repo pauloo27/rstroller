@@ -1,5 +1,5 @@
 use super::CommandName;
-use crate::core::CommandExecContext;
+use crate::core_definition::CommandExecContext;
 use mpris::{DBusError, MetadataValue};
 use std::process;
 
