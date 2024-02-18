@@ -1,8 +1,8 @@
 mod cmds;
-mod core;
+mod core_definition;
 
 use cmds::CommandName;
-use core::{App, Command, CommandFlag};
+use core_definition::{App, Command, CommandFlag};
 use once_cell::sync::Lazy;
 
 static PLAYER_FLAG: Lazy<CommandFlag> = Lazy::new(|| {

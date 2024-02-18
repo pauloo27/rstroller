@@ -2,7 +2,7 @@ use super::utils::{
     exec_player_action, exec_player_action_silent, format_metadata_value, parse_offset, print_if_ok,
 };
 use super::CommandName;
-use crate::core::CommandExecContext;
+use crate::core_definition::CommandExecContext;
 use common;
 use mpris::{DBusError, PlayerFinder};
 use std::process;

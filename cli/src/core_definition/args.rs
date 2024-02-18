@@ -100,7 +100,7 @@ impl ArgParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::CommandFlag;
+    use crate::core_definition::CommandFlag;
 
     #[test]
     fn test_parse_flag() {
