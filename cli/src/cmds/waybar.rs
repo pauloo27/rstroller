@@ -76,7 +76,7 @@ fn show(player: &mpris::Player) -> Result<(), DBusError> {
                 title,
                 artists,
                 match album {
-                    Some(album) if !album.is_empty() => format!("from the album {}", album),
+                    Some(album) if !album.is_empty() => format!(" from the album {}", album),
                     _ => "".to_string(),
                 }
             ),
