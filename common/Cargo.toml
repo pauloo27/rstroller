@@ -10,4 +10,4 @@ mpris = "2.0.1"
 anyhow = "1.0"
 itertools = "0.12"
 tokio = { version = "1", features = ["full"] }
-
+notify = "6.1.1"

@@ -1,16 +1,17 @@
-use std::path::Path;
-use std::{fs, io};
-
 use anyhow::Context;
 use anyhow::Result as AnyResult;
 use itertools::Itertools;
 use mpris::{Player, PlayerFinder};
+use std::path::Path;
+use std::{fs, io};
 
 mod mpris_listener;
 mod player_state;
+mod preferred_player_listener;
 
 pub use mpris_listener::*;
 pub use player_state::*;
+pub use preferred_player_listener::*;
 
 const PREFERRED_PLAYER_FILE_PATH: &'static str = "/dev/shm/rstroller-player";
 
