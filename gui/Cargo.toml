@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.79"
-async-channel = "2.2.0"
 common = { path = "../common" }
 gtk4 = "0.8.0"
 mpris = "2.0.1"
+tokio = { version = "1", features = ["full"] }

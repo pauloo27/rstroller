@@ -1,9 +1,10 @@
 use super::PlayerState;
 use std::{process, thread};
+use tokio::sync::mpsc;
 
-pub fn spawn_mpris_listener(sender: async_channel::Sender<PlayerState>) {
+pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) {
     thread::spawn(move || {
-        let player = match common::player::get_preferred_player_or_first() {
+        let player = match super::get_preferred_player_or_first() {
             Ok(Some(player)) => player,
             Ok(None) => {
                 eprintln!("Player not found");
@@ -24,14 +25,14 @@ pub fn spawn_mpris_listener(sender: async_channel::Sender<PlayerState>) {
 
         // send initial player state
         sender
-            .send_blocking(last_player_state.clone())
+            .blocking_send(last_player_state.clone())
             .expect("Failed to send metadata");
 
         for event in events {
             last_player_state =
                 last_player_state.handle_event(event.expect("Failed to read mpris event"));
             sender
-                .send_blocking(last_player_state.clone())
+                .blocking_send(last_player_state.clone())
                 .expect("Failed to send metadata");
         }
     });

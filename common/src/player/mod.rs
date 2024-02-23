@@ -6,6 +6,12 @@ use anyhow::Result as AnyResult;
 use itertools::Itertools;
 use mpris::{Player, PlayerFinder};
 
+mod mpris_listener;
+mod player_state;
+
+pub use mpris_listener::*;
+pub use player_state::*;
+
 const PREFERRED_PLAYER_FILE_PATH: &'static str = "/dev/shm/rstroller-player";
 
 /// Gets a name from the preferred player file.

@@ -1,5 +1,3 @@
-mod mpris_listener;
-mod player_state;
 mod ui;
 
 use std::{cell::RefCell, rc::Rc};
@@ -8,7 +6,9 @@ use gtk::glib::{self, clone};
 use gtk::prelude::*;
 use gtk4 as gtk;
 
-pub use player_state::PlayerState;
+use tokio::sync::mpsc;
+
+use common::player::{spawn_mpris_listener, PlayerState};
 
 const APP_ID: &str = "cafe.ndo.Rstroller";
 
@@ -93,12 +93,12 @@ impl App {
     }
 
     fn listen_to_mpris(self: Rc<Self>) {
-        let (sender, receiver) = async_channel::bounded(1);
+        let (sender, mut receiver) = mpsc::channel(1);
 
-        mpris_listener::spawn_mpris_listener(sender);
+        spawn_mpris_listener(sender);
 
         glib::spawn_future_local(clone!(@weak self as app => async move {
-            while let Ok(state) = receiver.recv().await {
+            while let Some(state) = receiver.recv().await {
                 app.emit_player_state(state);
             }
         }));
