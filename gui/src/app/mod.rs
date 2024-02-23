@@ -6,6 +6,8 @@ use gtk::glib::{self, clone};
 use gtk::prelude::*;
 use gtk4 as gtk;
 
+use std::process;
+
 use tokio::sync::mpsc;
 
 use common::player::{spawn_mpris_listener, PlayerState};
@@ -95,7 +97,20 @@ impl App {
     fn listen_to_mpris(self: Rc<Self>) {
         let (sender, mut receiver) = mpsc::channel(1);
 
-        spawn_mpris_listener(sender);
+        let player_name = spawn_mpris_listener(sender);
+        match player_name {
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                process::exit(1);
+            }
+            Ok(None) => {
+                eprintln!("No player found");
+                process::exit(1);
+            }
+            Ok(Some(name)) => {
+                println!("Player found: {}", name);
+            }
+        }
 
         glib::spawn_future_local(clone!(@weak self as app => async move {
             while let Some(state) = receiver.recv().await {

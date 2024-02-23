@@ -1,20 +1,27 @@
 use super::PlayerState;
+use anyhow::Result as AnyResult;
 use std::{process, thread};
 use tokio::sync::mpsc;
 
-pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) {
+pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Option<String>> {
+    let (ready_tx, ready_rx) = std::sync::mpsc::channel::<AnyResult<Option<String>>>();
+
     thread::spawn(move || {
         let player = match super::get_preferred_player_or_first() {
             Ok(Some(player)) => player,
             Ok(None) => {
-                eprintln!("Player not found");
-                process::exit(1);
+                ready_tx.send(Ok(None)).expect("Failed to send None");
+                return;
             }
             Err(e) => {
-                eprintln!("Error: {}", e);
-                process::exit(1);
+                ready_tx.send(Err(e)).expect("Failed to send error");
+                return;
             }
         };
+
+        ready_tx
+            .send(Ok(Some(player.identity().to_string())))
+            .expect("Failed to send identity");
 
         let events = player.events().unwrap_or_else(|e| {
             eprintln!("Error: {}", e);
@@ -36,4 +43,6 @@ pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) {
                 .expect("Failed to send metadata");
         }
     });
+
+    ready_rx.recv().unwrap()
 }
