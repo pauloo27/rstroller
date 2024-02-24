@@ -114,7 +114,13 @@ impl App {
 
         glib::spawn_future_local(clone!(@weak self as app => async move {
             while let Some(state) = receiver.recv().await {
-                app.emit_player_state(state);
+                match state {
+                    Some(state) => app.emit_player_state(state),
+                    None => {
+                        eprintln!("Player shut down");
+                        process::exit(0);
+                    }
+                }
             }
         }));
     }

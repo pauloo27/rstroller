@@ -64,14 +64,18 @@ pub async fn start_waybar_loop() {
 }
 
 async fn handle_player(
-    mut event_rx: Receiver<PlayerState>,
+    mut event_rx: Receiver<Option<PlayerState>>,
     mut player_rx: Receiver<AnyResult<String>>,
 ) -> Receiver<AnyResult<String>> {
     loop {
         tokio::select! {
             state = event_rx.recv() => {
+                let state = state.expect("Failed to get player state");
+
                 if let Some(state) = state {
                     show(state).expect("Failed to show player state");
+                } else {
+                    break;
                 }
             },
             _ = player_rx.recv() => {

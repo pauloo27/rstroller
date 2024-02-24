@@ -3,7 +3,9 @@ use anyhow::Result as AnyResult;
 use std::{process, thread};
 use tokio::sync::mpsc;
 
-pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Option<String>> {
+pub fn spawn_mpris_listener(
+    sender: mpsc::Sender<Option<PlayerState>>,
+) -> AnyResult<Option<String>> {
     let (ready_tx, ready_rx) = std::sync::mpsc::channel::<AnyResult<Option<String>>>();
 
     thread::spawn(move || {
@@ -28,20 +30,35 @@ pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Opti
             process::exit(1);
         });
 
-        let mut last_player_state = PlayerState::new(&player);
+        let mut player_state = PlayerState::new(&player);
 
         // send initial player state
         sender
-            .blocking_send(last_player_state.clone())
+            .blocking_send(Some(player_state.clone()))
             .expect("Failed to send initial state");
 
         for event in events {
-            last_player_state =
-                last_player_state.handle_event(event.expect("Failed to read mpris event"));
-            sender
-                .blocking_send(last_player_state.clone())
-                .expect("Failed to send state");
+            match event {
+                Ok(event) => {
+                    player_state = match player_state.handle_event(event) {
+                        Some(state) => state,
+                        None => break,
+                    };
+
+                    sender
+                        .blocking_send(Some(player_state.clone()))
+                        .expect("Failed to send state");
+                }
+                Err(_) => {
+                    break;
+                }
+            }
         }
+
+        // send one final state
+        sender
+            .blocking_send(None)
+            .expect("Failed to send initial state");
     });
 
     ready_rx.recv().unwrap()

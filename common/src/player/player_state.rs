@@ -22,7 +22,8 @@ impl PlayerState {
         }
     }
 
-    pub fn handle_event(mut self, event: mpris::Event) -> Self {
+    pub fn handle_event(mut self, event: mpris::Event) -> Option<Self> {
+        println!("{:?}", event);
         match event {
             // the easy ones :)
             Event::TrackChanged(metadata) => self.metadata = metadata,
@@ -36,8 +37,7 @@ impl PlayerState {
             // seek is not reliable, instead we query it
             Event::Seeked { position_in_us: _ } => {}
 
-            // TODO: need to handle those
-            Event::PlayerShutDown => {}
+            Event::PlayerShutDown => return None,
 
             // we don't really care about the Tracklist, just the current one
             // if the track changed is the current one, will it call
@@ -53,6 +53,7 @@ impl PlayerState {
             // i can't do much with this
             Event::PlaybackRateChanged(_) => {}
         }
-        self
+
+        Some(self)
     }
 }
