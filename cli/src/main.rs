@@ -34,7 +34,7 @@ fn new_app() -> App<'static, CommandName> {
         &cmds::help_cmd,
     ))
     .add_command(Command::new(
-        CommandName::ListPlayers,
+        CommandName::List,
         "list available MPRIS players",
         &cmds::list_players_cmd,
     ))

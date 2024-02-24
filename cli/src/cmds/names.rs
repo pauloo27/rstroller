@@ -5,7 +5,7 @@ use strum_macros::EnumIter;
 #[derive(EnumIter, Hash, Eq, PartialEq, Clone)]
 pub enum CommandName {
     Help,
-    ListPlayers,
+    List,
     Status,
     SetPreferredPlayer,
     Play,
@@ -28,7 +28,7 @@ impl CommandName {
     pub fn value(&self) -> &'static str {
         match self {
             CommandName::Help => "help",
-            CommandName::ListPlayers => "list-players",
+            CommandName::List => "list",
             CommandName::Status => "status",
             CommandName::SetPreferredPlayer => "set-preferred-player",
             CommandName::Play => "play",
@@ -55,7 +55,7 @@ impl FromStr for CommandName {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "help" => Ok(CommandName::Help),
-            "list-players" => Ok(CommandName::ListPlayers),
+            "list" => Ok(CommandName::List),
             "status" => Ok(CommandName::Status),
             "play" => Ok(CommandName::Play),
             "pause" => Ok(CommandName::Pause),
