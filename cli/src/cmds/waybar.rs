@@ -33,7 +33,22 @@ pub async fn start_waybar_loop() {
             common::player::spawn_mpris_listener(event_tx).expect("Failed to spawn listener");
 
         match player_name {
-            Some(_) => player_rx = handle_player(event_rx, player_rx).await,
+            Some(ref player_name) => {
+                let preferred_player = common::player::get_preferred_player_name()
+                    .expect("Failed to get preferred player name");
+                match preferred_player {
+                    Some(preferred_player) => {
+                        if !preferred_player.eq(player_name) {
+                            common::player::set_preferred_player_name(player_name)
+                                .expect("Failed to set preferred player name");
+                        }
+                    }
+                    None => common::player::set_preferred_player_name(player_name)
+                        .expect("Failed to set preferred player name"),
+                }
+
+                player_rx = handle_player(event_rx, player_rx).await;
+            }
             None => {
                 if had_prev_player {
                     println!(

@@ -70,8 +70,9 @@ pub fn exec_player_action_silent<F>(
     }
 }
 
-pub fn print_if_ok<T>(key: &str, value: Result<T, DBusError>) 
-    where T : std::fmt::Debug
+pub fn print_if_ok<T>(key: &str, value: Result<T, DBusError>)
+where
+    T: std::fmt::Debug,
 {
     if let Ok(value) = value {
         println!("{}: {:?}", key, value);

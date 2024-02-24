@@ -20,8 +20,8 @@ pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Opti
         };
 
         ready_tx
-            .send(Ok(Some(player.identity().to_string())))
-            .expect("Failed to send identity");
+            .send(Ok(Some(player.bus_name().to_string())))
+            .expect("Failed to send bus name");
 
         let events = player.events().unwrap_or_else(|e| {
             eprintln!("Error: {}", e);
@@ -33,14 +33,14 @@ pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Opti
         // send initial player state
         sender
             .blocking_send(last_player_state.clone())
-            .expect("Failed to send metadata");
+            .expect("Failed to send initial state");
 
         for event in events {
             last_player_state =
                 last_player_state.handle_event(event.expect("Failed to read mpris event"));
             sender
                 .blocking_send(last_player_state.clone())
-                .expect("Failed to send metadata");
+                .expect("Failed to send state");
         }
     });
 
