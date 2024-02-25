@@ -3,9 +3,7 @@ use anyhow::Result as AnyResult;
 use std::{process, thread};
 use tokio::sync::mpsc;
 
-pub fn spawn_mpris_listener(
-    sender: mpsc::Sender<Option<PlayerState>>,
-) -> AnyResult<Option<String>> {
+pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Option<String>> {
     let (ready_tx, ready_rx) = std::sync::mpsc::channel::<AnyResult<Option<String>>>();
 
     thread::spawn(move || {
@@ -34,7 +32,7 @@ pub fn spawn_mpris_listener(
 
         // send initial player state
         sender
-            .blocking_send(Some(player_state.clone()))
+            .blocking_send(player_state.clone())
             .expect("Failed to send initial state");
 
         for event in events {
@@ -46,7 +44,7 @@ pub fn spawn_mpris_listener(
                     };
 
                     sender
-                        .blocking_send(Some(player_state.clone()))
+                        .blocking_send(player_state.clone())
                         .expect("Failed to send state");
                 }
                 Err(_) => {
@@ -54,11 +52,6 @@ pub fn spawn_mpris_listener(
                 }
             }
         }
-
-        // send one final state
-        sender
-            .blocking_send(None)
-            .expect("Failed to send initial state");
     });
 
     ready_rx.recv().unwrap()
