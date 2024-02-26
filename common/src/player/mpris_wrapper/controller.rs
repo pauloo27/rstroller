@@ -31,6 +31,11 @@ pub fn spawn_mpris_controller(
                 PlayerAction::PlayPause => player.play_pause().expect("Failed to play/pause"),
                 PlayerAction::Next => player.next().expect("Failed to play next"),
                 PlayerAction::Previous => player.previous().expect("Failed to play previous"),
+                PlayerAction::Raise => player.raise().expect("Failed to raise"),
+                PlayerAction::Shuffle(v) => player.set_shuffle(v).expect("Failed to set shuffle"),
+                PlayerAction::Volume(volume) => {
+                    player.set_volume(volume).expect("Failed to set volume")
+                }
             }
         }
     });
