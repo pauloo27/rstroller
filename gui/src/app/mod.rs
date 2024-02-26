@@ -1,16 +1,15 @@
 mod ui;
 
+use std::sync::mpsc;
 use std::{cell::RefCell, rc::Rc};
 
 use gtk::glib::{self, clone};
 use gtk::prelude::*;
 use gtk4 as gtk;
 
+use common::player::{PlayerAction, PlayerState};
 use std::process;
-
-use tokio::sync::mpsc;
-
-use common::player::{spawn_mpris_listener, PlayerState};
+use tokio::sync::mpsc as tokio_mpsc;
 
 const APP_ID: &str = "cafe.ndo.Rstroller";
 
@@ -19,6 +18,7 @@ type MprisListener = dyn Fn(&PlayerState);
 pub struct App {
     gtk_app: gtk::Application,
     listeners: RefCell<Vec<Box<MprisListener /*---[*/>>>,
+    action_sender: RefCell<Option<mpsc::Sender<PlayerAction>>>,
 }
 
 // public interface
@@ -29,6 +29,7 @@ impl App {
         App {
             gtk_app,
             listeners: RefCell::new(Vec::new()),
+            action_sender: RefCell::new(None),
         }
     }
 
@@ -36,7 +37,7 @@ impl App {
         self.gtk_app.connect_startup(|_| Self::load_global_css());
         self.gtk_app
             .connect_activate(clone!(@weak self as app => move |_| {
-                app.setup_ui();
+                app.clone().setup_ui();
                 app.listen_to_mpris();
             }));
 
@@ -55,6 +56,13 @@ impl App {
             listener(&state);
         }
     }
+
+    pub fn send_action(&self, action: PlayerAction) {
+        let sender = self.action_sender.borrow();
+        if let Some(sender) = sender.as_ref() {
+            sender.send(action).unwrap();
+        }
+    }
 }
 
 // internal implementation
@@ -70,7 +78,7 @@ impl App {
         );
     }
 
-    fn setup_ui(&self) {
+    fn setup_ui(self: Rc<Self>) {
         let window = gtk::ApplicationWindow::builder()
             .application(&self.gtk_app)
             .title("Rstroller")
@@ -88,7 +96,7 @@ impl App {
             .build();
 
         container.append(&ui::track_info::new(&self));
-        container.append(&ui::player_controller::new(&self));
+        container.append(&ui::player_controller::new(self.clone()));
 
         window.set_child(Some(&container));
 
@@ -96,10 +104,12 @@ impl App {
     }
 
     fn listen_to_mpris(self: Rc<Self>) {
-        let (sender, mut receiver) = mpsc::channel(1);
+        let (player_tx, mut player_rx) = tokio_mpsc::channel(1);
+        let (action_tx, action_rx) = mpsc::channel();
 
-        let player_name = spawn_mpris_listener(sender);
-        match player_name {
+        let player = common::player::get_preferred_player_or_first();
+
+        match player {
             Err(err) => {
                 eprintln!("Error: {}", err);
                 process::exit(1);
@@ -108,13 +118,22 @@ impl App {
                 eprintln!("No player found");
                 process::exit(1);
             }
-            Ok(Some(name)) => {
-                println!("Player found: {}", name);
+            Ok(Some(player)) => {
+                let player_name = player.bus_name();
+                println!("Player found: {}", player_name);
+                let wrapper = common::player::MprisWrapper::new(player_name.to_string());
+                wrapper
+                    .start_listener(player_tx)
+                    .expect("Could not start listener");
+                wrapper
+                    .start_controller(action_rx)
+                    .expect("Could not start controller");
+                self.action_sender.replace(Some(action_tx));
             }
         }
 
         glib::spawn_future_local(clone!(@weak self as app => async move {
-            while let Some(state) = receiver.recv().await {
+            while let Some(state) = player_rx.recv().await {
                     app.emit_player_state(state);
             }
             eprintln!("Player shut down");

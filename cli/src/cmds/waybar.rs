@@ -1,7 +1,7 @@
 use super::CommandName;
 use crate::core_definition::CommandExecContext;
 use anyhow::Result as AnyResult;
-use common::player::PlayerState;
+use common::player::{MprisWrapper, PlayerState};
 use mpris::DBusError;
 use serde_json::json;
 use std::process;
@@ -28,26 +28,23 @@ pub async fn start_waybar_loop() {
     let mut had_prev_player = true;
 
     loop {
-        let (event_tx, event_rx) = mpsc::channel(1);
-        let player_name =
-            common::player::spawn_mpris_listener(event_tx).expect("Failed to spawn listener");
+        let player = common::player::get_preferred_player_or_first().expect("Failed to get player");
 
-        match player_name {
-            Some(ref player_name) => {
-                let preferred_player = common::player::get_preferred_player_name()
-                    .expect("Failed to get preferred player name");
-                match preferred_player {
-                    Some(preferred_player) => {
-                        if !preferred_player.eq(player_name) {
-                            common::player::set_preferred_player_name(player_name)
-                                .expect("Failed to set preferred player name");
-                        }
-                    }
-                    None => common::player::set_preferred_player_name(player_name)
-                        .expect("Failed to set preferred player name"),
-                }
+        match player {
+            Some(ref player) => {
+                let player_name = player.bus_name();
 
-                player_rx = handle_player(event_rx, player_rx).await;
+                let wrapper = MprisWrapper::new(player_name.to_string());
+                let (event_tx, event_rx) = mpsc::channel(1);
+
+                common::player::set_preferred_player_name(player_name)
+                    .expect("Failed to set player");
+
+                wrapper
+                    .start_listener(event_tx)
+                    .expect("Failed to start listener");
+
+                player_rx = handle_player(player_name, event_rx, player_rx).await;
             }
             None => {
                 if had_prev_player {
@@ -59,11 +56,12 @@ pub async fn start_waybar_loop() {
                 std::thread::sleep(std::time::Duration::from_secs(1));
             }
         }
-        had_prev_player = player_name.is_some();
+        had_prev_player = player.is_some();
     }
 }
 
 async fn handle_player(
+    player_name: &str,
     mut event_rx: Receiver<PlayerState>,
     mut player_rx: Receiver<AnyResult<String>>,
 ) -> Receiver<AnyResult<String>> {
@@ -76,8 +74,15 @@ async fn handle_player(
                     break;
                 }
             },
-            _ = player_rx.recv() => {
-                break;
+            new_player_name = player_rx.recv() => {
+                match new_player_name {
+                    Some(Ok(new_player_name)) => {
+                        if new_player_name != player_name {
+                            break;
+                        }
+                    },
+                    _ => break,
+                }
             }
         }
     }

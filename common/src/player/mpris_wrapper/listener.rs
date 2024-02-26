@@ -1,16 +1,22 @@
+use super::super::get_player_by_bus_name;
 use super::PlayerState;
 use anyhow::Result as AnyResult;
 use std::{process, thread};
 use tokio::sync::mpsc;
 
-pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Option<String>> {
-    let (ready_tx, ready_rx) = std::sync::mpsc::channel::<AnyResult<Option<String>>>();
+pub fn spawn_mpris_listener(
+    player_name: String,
+    sender: mpsc::Sender<PlayerState>,
+) -> AnyResult<()> {
+    let (ready_tx, ready_rx) = std::sync::mpsc::channel();
 
     thread::spawn(move || {
-        let player = match super::get_preferred_player_or_first() {
+        let player = match get_player_by_bus_name(&player_name) {
             Ok(Some(player)) => player,
             Ok(None) => {
-                ready_tx.send(Ok(None)).expect("Failed to send None");
+                ready_tx
+                    .send(Err(anyhow::anyhow!("Player not found")))
+                    .expect("Failed to send error");
                 return;
             }
             Err(e) => {
@@ -19,9 +25,7 @@ pub fn spawn_mpris_listener(sender: mpsc::Sender<PlayerState>) -> AnyResult<Opti
             }
         };
 
-        ready_tx
-            .send(Ok(Some(player.bus_name().to_string())))
-            .expect("Failed to send bus name");
+        ready_tx.send(Ok(())).expect("Failed to send bus name");
 
         let events = player.events().unwrap_or_else(|e| {
             eprintln!("Error: {}", e);

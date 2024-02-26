@@ -1,10 +1,13 @@
+use std::rc::Rc;
+
 use super::super::App;
+use common::player::PlayerAction;
 use glib::clone;
 use gtk::glib;
 use gtk::prelude::*;
 use gtk4 as gtk;
 
-pub fn new(app: &App) -> gtk::Box {
+pub fn new(app: Rc<App>) -> gtk::Box {
     let container = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .spacing(10)
@@ -21,15 +24,27 @@ pub fn new(app: &App) -> gtk::Box {
         .tooltip_text("Previous")
         .build();
 
+    prev_btn.connect_clicked(clone!(@weak app => move |_| {
+        app.send_action(PlayerAction::Previous);
+    }));
+
     let play_btn = gtk::Button::builder()
         .icon_name("media-playback-start-symbolic")
         .tooltip_text("Play/Pause")
         .build();
 
+    play_btn.connect_clicked(clone!(@weak app => move |_| {
+        app.send_action(PlayerAction::PlayPause);
+    }));
+
     let next_btn = gtk::Button::builder()
         .icon_name("media-skip-forward-symbolic")
         .tooltip_text("Next")
         .build();
+
+    next_btn.connect_clicked(clone!(@weak app => move |_| {
+        app.send_action(PlayerAction::Next);
+    }));
 
     let more_btn = gtk::Button::builder()
         .icon_name("view-more-symbolic")

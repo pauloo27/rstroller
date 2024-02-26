@@ -1,7 +1,5 @@
-mod mpris_listener;
-mod player_state;
+mod mpris_wrapper;
 mod preferred_player;
 
-pub use mpris_listener::*;
-pub use player_state::*;
+pub use mpris_wrapper::*;
 pub use preferred_player::*;

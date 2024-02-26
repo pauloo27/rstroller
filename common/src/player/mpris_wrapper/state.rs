@@ -23,7 +23,6 @@ impl PlayerState {
     }
 
     pub fn handle_event(mut self, event: mpris::Event) -> Option<Self> {
-        println!("{:?}", event);
         match event {
             // the easy ones :)
             Event::TrackChanged(metadata) => self.metadata = metadata,
