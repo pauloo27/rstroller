@@ -88,6 +88,7 @@ impl App {
             .build();
 
         container.append(&ui::track_info::new(&self));
+        container.append(&ui::player_controller::new(&self));
 
         window.set_child(Some(&container));
 
