@@ -1,5 +1,6 @@
 use super::super::get_player_by_bus_name;
 use super::PlayerState;
+use crate::err::*;
 use anyhow::Result as AnyResult;
 use std::{process, thread};
 use tokio::sync::mpsc;
@@ -16,16 +17,16 @@ pub fn spawn_mpris_listener(
             Ok(None) => {
                 ready_tx
                     .send(Err(anyhow::anyhow!("Player not found")))
-                    .expect("Failed to send error");
+                    .or_exit("Failed to send error");
                 return;
             }
             Err(e) => {
-                ready_tx.send(Err(e)).expect("Failed to send error");
+                ready_tx.send(Err(e)).or_exit("Failed to send error");
                 return;
             }
         };
 
-        ready_tx.send(Ok(())).expect("Failed to send bus name");
+        ready_tx.send(Ok(())).or_exit("Failed to send bus name");
 
         let events = player.events().unwrap_or_else(|e| {
             eprintln!("Error: {}", e);
@@ -37,7 +38,7 @@ pub fn spawn_mpris_listener(
         // send initial player state
         sender
             .blocking_send(player_state.clone())
-            .expect("Failed to send initial state");
+            .or_exit("Failed to send initial state");
 
         for event in events {
             match event {
@@ -49,7 +50,7 @@ pub fn spawn_mpris_listener(
 
                     sender
                         .blocking_send(player_state.clone())
-                        .expect("Failed to send state");
+                        .or_exit("Failed to send state");
                 }
                 Err(_) => {
                     break;

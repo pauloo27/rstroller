@@ -1,4 +1,5 @@
 use super::{super::get_player_by_bus_name, PlayerAction};
+use crate::err::*;
 use anyhow::Result as AnyResult;
 use std::sync::mpsc;
 use std::thread;
@@ -15,30 +16,30 @@ pub fn spawn_mpris_controller(
             Ok(None) => {
                 ready_tx
                     .send(Err(anyhow::anyhow!("Player not found")))
-                    .expect("Failed to send error");
+                    .or_exit("Failed to send error");
                 return;
             }
             Err(e) => {
-                ready_tx.send(Err(e)).expect("Failed to send error");
+                ready_tx.send(Err(e)).or_exit("Failed to send error");
                 return;
             }
         };
 
-        ready_tx.send(Ok(())).expect("Failed to send bus name");
+        ready_tx.send(Ok(())).or_exit("Failed to send ready signal");
 
         while let Ok(action) = receiver.recv() {
             match action {
-                PlayerAction::PlayPause => player.play_pause().expect("Failed to play/pause"),
-                PlayerAction::Next => player.next().expect("Failed to play next"),
-                PlayerAction::Previous => player.previous().expect("Failed to play previous"),
-                PlayerAction::Raise => player.raise().expect("Failed to raise"),
-                PlayerAction::Shuffle(v) => player.set_shuffle(v).expect("Failed to set shuffle"),
+                PlayerAction::PlayPause => player.play_pause().log_err("Failed to play/pause"),
+                PlayerAction::Next => player.next().log_err("Failed to play next"),
+                PlayerAction::Previous => player.previous().log_err("Failed to play previous"),
+                PlayerAction::Raise => player.raise().log_err("Failed to raise"),
+                PlayerAction::Shuffle(v) => player.set_shuffle(v).log_err("Failed to set shuffle"),
                 PlayerAction::Volume(volume) => {
-                    player.set_volume(volume).expect("Failed to set volume")
+                    player.set_volume(volume).log_err("Failed to set volume")
                 }
             }
         }
     });
 
-    ready_rx.recv().unwrap()
+    ready_rx.recv().or_exit("Failed to receive ready signal")
 }

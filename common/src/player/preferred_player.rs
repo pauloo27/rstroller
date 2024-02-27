@@ -1,5 +1,6 @@
 use std::{fs, io, path::Path, process};
 
+use crate::err::*;
 use anyhow::{Context, Result as AnyResult};
 use itertools::Itertools;
 use mpris::{Player, PlayerFinder};
@@ -79,7 +80,7 @@ impl PreferredPlayerListener {
                         tx.blocking_send(
                             player_name.context("Failed to read preferred player file"),
                         )
-                        .expect("Failed to send message in mpsc");
+                        .or_exit("Failed to send message in mpsc");
                     }
                 }
                 Err(_) => {
