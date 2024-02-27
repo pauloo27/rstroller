@@ -10,6 +10,7 @@ use gtk4 as gtk;
 pub fn new(app: Rc<App>) -> gtk::Box {
     let container = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
+        .css_name("controller-container")
         .spacing(10)
         .margin_bottom(10)
         .halign(gtk::Align::Center)

@@ -9,6 +9,7 @@ edition = "2021"
 anyhow = "1.0.79"
 common = { path = "../common" }
 gtk4 = "0.8.0"
+image = "0.24.9"
 mpris = "2.0.1"
 reqwest = { version = "0.11.24", features = ["blocking"] }
 tokio = { version = "1", features = ["full"] }

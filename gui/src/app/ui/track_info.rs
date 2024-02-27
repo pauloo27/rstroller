@@ -7,6 +7,7 @@ use gtk4 as gtk;
 pub fn new(app: &App) -> gtk::Box {
     let container = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
+        .css_name("track-info-container")
         .build();
 
     let title_lbl = gtk::Label::builder().css_name("track-title-label").build();
@@ -18,7 +19,7 @@ pub fn new(app: &App) -> gtk::Box {
     app.add_listener(clone!(@weak title_lbl, @weak artist_lbl => move |p| {
         let title_txt = p.metadata.title().unwrap_or("Unknown");
         title_lbl.set_tooltip_text(Some(title_txt));
-        title_lbl.set_text(&common::utils::truncate_string(&title_txt, 30));
+        title_lbl.set_text(&common::utils::truncate_string(&title_txt, 25));
 
         let artist_txt = match p.metadata.artists() {
             Some(artists) => artists.join(", "),

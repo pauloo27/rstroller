@@ -85,16 +85,25 @@ impl App {
             .title("Rstroller")
             .default_width(WINDOW_WIDTH)
             .default_height(200)
+            .css_name("rstroller-window")
             .build();
 
         let container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
-            .spacing(20)
+            .build();
+
+        let main_container = gtk::Box::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .css_name("main-container")
+            .vexpand(true)
+            .spacing(10)
             .build();
 
         container.append(&ui::album_art::new(&self));
-        container.append(&ui::track_info::new(&self));
-        container.append(&ui::player_controller::new(self.clone()));
+        container.append(&main_container);
+
+        main_container.append(&ui::track_info::new(&self));
+        main_container.append(&ui::player_controller::new(self.clone()));
 
         window.set_child(Some(&container));
 
