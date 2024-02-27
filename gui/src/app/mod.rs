@@ -12,6 +12,7 @@ use std::process;
 use tokio::sync::mpsc as tokio_mpsc;
 
 const APP_ID: &str = "cafe.ndo.Rstroller";
+pub const WINDOW_WIDTH: i32 = 250;
 
 type MprisListener = dyn Fn(&PlayerState);
 
@@ -82,19 +83,16 @@ impl App {
         let window = gtk::ApplicationWindow::builder()
             .application(&self.gtk_app)
             .title("Rstroller")
-            .default_width(300)
-            .default_height(150)
+            .default_width(WINDOW_WIDTH)
+            .default_height(200)
             .build();
 
         let container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .spacing(20)
-            .margin_top(10)
-            .margin_bottom(10)
-            .margin_start(10)
-            .margin_end(10)
             .build();
 
+        container.append(&ui::album_art::new(&self));
         container.append(&ui::track_info::new(&self));
         container.append(&ui::player_controller::new(self.clone()));
 

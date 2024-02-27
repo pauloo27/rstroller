@@ -11,6 +11,7 @@ pub fn new(app: Rc<App>) -> gtk::Box {
     let container = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .spacing(10)
+        .margin_bottom(10)
         .halign(gtk::Align::Center)
         .build();
 
