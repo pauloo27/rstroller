@@ -2,6 +2,8 @@ use mpris::Event;
 
 #[derive(Debug, Clone)]
 pub struct PlayerState {
+    pub identity: String,
+    pub name: String,
     pub metadata: mpris::Metadata,
     pub playback_status: mpris::PlaybackStatus,
     pub loop_status: mpris::LoopStatus,
@@ -12,6 +14,8 @@ pub struct PlayerState {
 impl PlayerState {
     pub fn new(player: &mpris::Player) -> Self {
         PlayerState {
+            identity: player.identity().to_string(),
+            name: player.bus_name().to_string(),
             metadata: player.get_metadata().unwrap_or_default(),
             playback_status: player
                 .get_playback_status()

@@ -2,7 +2,7 @@ track-title-label {
   font-size: 17px;
 }
 
-track-artist-label {
+track-artist-label, player-name-label {
   font-size: 14px;
 }
 

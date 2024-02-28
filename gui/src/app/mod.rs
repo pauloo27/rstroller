@@ -104,6 +104,7 @@ impl App {
 
         main_container.append(&ui::track_info::new(&self));
         main_container.append(&ui::player_controller::new(self.clone()));
+        main_container.append(&ui::player_info::new(&self));
 
         window.set_child(Some(&container));
 
