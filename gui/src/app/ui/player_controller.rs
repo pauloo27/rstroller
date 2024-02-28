@@ -80,6 +80,7 @@ fn create_volume_popover(app: Rc<App>, btn: &gtk::MenuButton) -> gtk::Popover {
         .inverted(true)
         .build();
     let popover = gtk::Popover::builder().child(&scale).build();
+
     btn.set_popover(Some(&popover));
 
     app.add_listener(clone!(@weak scale => move |state| {
@@ -87,7 +88,10 @@ fn create_volume_popover(app: Rc<App>, btn: &gtk::MenuButton) -> gtk::Popover {
     }));
 
     scale.connect_value_changed(clone!(@weak app => move |scale| {
-        app.send_action(PlayerAction::Volume(scale.value()));
+        let volume = scale.value();
+        let volume = (volume * 100.0).round() / 100.0;
+
+        app.send_action(PlayerAction::Volume(volume));
     }));
 
     let (w, h) = scale.size_request();

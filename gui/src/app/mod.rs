@@ -19,6 +19,7 @@ type MprisListener = dyn Fn(&PlayerState);
 pub struct App {
     gtk_app: gtk::Application,
     listeners: RefCell<Vec<Box<MprisListener /*---[*/>>>,
+    most_recent_state: RefCell<Option<PlayerState>>,
     action_sender: RefCell<Option<mpsc::Sender<PlayerAction>>>,
 }
 
@@ -28,6 +29,7 @@ impl App {
         let gtk_app = gtk::Application::builder().application_id(APP_ID).build();
 
         App {
+            most_recent_state: RefCell::new(None),
             gtk_app,
             listeners: RefCell::new(Vec::new()),
             action_sender: RefCell::new(None),
@@ -56,6 +58,7 @@ impl App {
         for listener in self.listeners.borrow().iter() {
             listener(&state);
         }
+        self.most_recent_state.replace(Some(state));
     }
 
     pub fn send_action(&self, action: PlayerAction) {
