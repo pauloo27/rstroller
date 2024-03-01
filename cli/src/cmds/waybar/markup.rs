@@ -5,26 +5,17 @@ pub fn escape_gtk_markup(input: &str) -> String {
     let mut pending = input.chars().clone();
 
     while let Some(c) = pending.next() {
-        match c {
-            '&' => {
-                result.push_str("&amp;");
+        result.push_str(
+            match c {
+                '&' => Some("&amp;"),
+                '<' => Some("&lt;"),
+                '>' => Some("&gt;"),
+                '\'' => Some("&apos;"),
+                '"' => Some("&quot;"),
+                _ => None,
             }
-            '<' => {
-                result.push_str("&lt;");
-            }
-            '>' => {
-                result.push_str("&gt;");
-            }
-            '\'' => {
-                result.push_str("&apos;");
-            }
-            '"' => {
-                result.push_str("&quot;");
-            }
-            c => {
-                result.push(c);
-            }
-        }
+            .unwrap_or(&c.to_string()),
+        );
     }
 
     result
