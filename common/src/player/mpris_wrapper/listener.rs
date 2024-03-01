@@ -48,9 +48,11 @@ pub fn spawn_mpris_listener(
                         None => break,
                     };
 
-                    sender
-                        .blocking_send(player_state.clone())
-                        .or_exit("Failed to send state");
+                    // the channed was closed...
+                    // FIXME: close this thread earlier
+                    if let Err(_) = sender.blocking_send(player_state.clone()) {
+                        break;
+                    }
                 }
                 Err(_) => {
                     break;
