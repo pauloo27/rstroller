@@ -1,7 +1,10 @@
+mod markup;
+
 use super::CommandName;
 use crate::core_definition::CommandExecContext;
 use anyhow::Result as AnyResult;
 use common::player::{MprisWrapper, PlayerState};
+use markup::escape_gtk_markup;
 use mpris::DBusError;
 use serde_json::json;
 use std::process;
@@ -107,28 +110,33 @@ fn show(state: PlayerState) -> Result<(), DBusError> {
             format!(
                 "{} {} by {}",
                 icon,
-                common::utils::truncate_string(title, 40),
-                common::utils::truncate_string(&artists, 20),
+                escape_gtk_markup(&common::utils::truncate_string(title, 40)),
+                escape_gtk_markup(&common::utils::truncate_string(&artists, 20)),
             ),
             format!(
                 "{} by {}{}",
-                title,
-                artists,
+                escape_gtk_markup(&title),
+                escape_gtk_markup(&artists),
                 match album {
-                    Some(album) if !album.is_empty() => format!(" from the album {}", album),
+                    Some(album) if !album.is_empty() =>
+                        format!(" from the album {}", escape_gtk_markup(album)),
                     _ => "".to_string(),
                 }
             ),
         ),
         None => (
-            format!("{} {}", icon, common::utils::truncate_string(title, 40)),
-            format!("{}", title),
+            format!(
+                "{} {}",
+                icon,
+                escape_gtk_markup(&common::utils::truncate_string(title, 40))
+            ),
+            format!("{}", escape_gtk_markup(title)),
         ),
     };
 
     let output = json!({
-        "text": line,
-        "tooltip": tooltip,
+        "text": &line,
+        "tooltip": &tooltip,
     });
 
     println!("{}", output.to_string());
