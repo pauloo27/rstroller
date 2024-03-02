@@ -32,6 +32,15 @@ pub fn spawn_mpris_controller(
                 PlayerAction::PlayPause => player.play_pause().log_err("Failed to play/pause"),
                 PlayerAction::Next => player.next().log_err("Failed to play next"),
                 PlayerAction::Previous => player.previous().log_err("Failed to play previous"),
+                PlayerAction::Seek(v) => {
+                    let track_id = player
+                        .get_metadata()
+                        .or_exit("Failed to get metadata")
+                        .track_id();
+                    if let Some(track_id) = track_id {
+                        player.set_position(track_id, &v).log_err("Failed to seek")
+                    }
+                }
                 PlayerAction::Raise => player.raise().log_err("Failed to raise"),
                 PlayerAction::Shuffle(v) => player.set_shuffle(v).log_err("Failed to set shuffle"),
                 PlayerAction::Volume(volume) => {
