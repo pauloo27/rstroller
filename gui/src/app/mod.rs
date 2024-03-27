@@ -91,26 +91,28 @@ impl App {
             .css_name("rstroller-window")
             .build();
 
-        let container = gtk::Box::builder()
-            .orientation(gtk::Orientation::Vertical)
-            .build();
-
         let main_container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .css_name("main-container")
+            .build();
+
+        let info_container = gtk::Box::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .css_name("info-container")
             .vexpand(true)
             .spacing(10)
             .build();
 
-        container.append(&ui::album_art::new(&self));
-        container.append(&main_container);
+        main_container.append(&ui::album_art::new(&self));
+        main_container.append(&info_container);
 
-        main_container.append(&ui::track_info::new(&self));
-        main_container.append(&ui::player_progress::new(self.clone()));
-        main_container.append(&ui::player_controller::new(self.clone()));
+        info_container.append(&ui::track_info::new(&self));
+        info_container.append(&ui::player_progress::new(self.clone()));
+        info_container.append(&ui::player_controller::new(self.clone()));
+
         main_container.append(&ui::player_info::new(&self));
 
-        window.set_child(Some(&container));
+        window.set_child(Some(&main_container));
 
         window.present();
     }

@@ -16,7 +16,9 @@ use std::thread;
 pub fn new(app: &App) -> gtk::Image {
     let img = gtk::Image::builder()
         .css_name("album-art")
-        .valign(gtk::Align::Start)
+        .valign(gtk::Align::Fill)
+        .vexpand(true)
+        .hexpand(true)
         .height_request(WINDOW_WIDTH)
         .build();
 
@@ -62,10 +64,10 @@ fn apply_art(img: gtk::Image, path: PathBuf, css_provider: gtk::CssProvider) {
                 let color1 = resized.get_pixel(0, 0);
                 let color2 = resized.get_pixel(1, 0);
 
-                let hex_color1 = format!("#{:02x}{:02x}{:02x}", color1[0], color1[1], color1[2]);
-                let hex_color2 = format!("#{:02x}{:02x}{:02x}", color2[0], color2[1], color2[2]);
+                let color1 = format!("#{:02x}{:02x}{:02x}", color1[0], color1[1], color1[2]);
+                let color2 = format!("#{:02x}{:02x}{:02x}", color2[0], color2[1], color2[2]);
 
-                tx.send((hex_color1, hex_color2)).unwrap();
+                tx.send((color1, color2)).unwrap();
             }
             Err(_) => tx
                 .send(("#000000".to_string(), "#000000".to_string()))

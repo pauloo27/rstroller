@@ -2,11 +2,15 @@ track-title-label {
   font-size: 17px;
 }
 
-track-artist-label, player-name-label {
+track-artist-label,
+player-name-label {
   font-size: 14px;
 }
 
 main-container {
   background-color: rgba(0, 0, 0, 0.25);
+}
+
+info-container {
   padding: 10px;
 }
