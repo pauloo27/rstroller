@@ -107,7 +107,7 @@ impl App {
         main_container.append(&info_container);
 
         info_container.append(&ui::track_info::new(&self));
-        info_container.append(&ui::player_progress::new(self.clone()));
+        //info_container.append(&ui::player_progress::new(self.clone()));
         info_container.append(&ui::player_controller::new(self.clone()));
 
         main_container.append(&ui::player_info::new(&self));
