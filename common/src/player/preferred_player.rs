@@ -7,7 +7,7 @@ use mpris::{Player, PlayerFinder};
 use notify::{event::AccessKind, event::AccessMode, EventKind, Watcher};
 use tokio::sync::mpsc::Receiver;
 
-const PREFERRED_PLAYER_FILE_PATH: &'static str = "/dev/shm/rstroller-player";
+const PREFERRED_PLAYER_FILE_PATH: &str = "/dev/shm/rstroller-player";
 
 pub fn get_preferred_player_name() -> AnyResult<Option<String>> {
     match fs::read_to_string(Path::new(PREFERRED_PLAYER_FILE_PATH)) {
@@ -95,6 +95,12 @@ impl PreferredPlayerListener {
             .unwrap()
             .watch(path, notify::RecursiveMode::NonRecursive)?;
 
-        return Ok(rx);
+        Ok(rx)
+    }
+}
+
+impl Default for PreferredPlayerListener {
+    fn default() -> Self {
+        Self::new()
     }
 }

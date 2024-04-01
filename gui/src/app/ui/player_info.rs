@@ -26,7 +26,7 @@ pub fn new(app: &App) -> gtk::Box {
             let icon_name = p.name.to_lowercase();
             let icon_name = icon_name.split('.').nth(3).unwrap_or("");
 
-            if gtk::IconTheme::default().has_icon(&icon_name) {
+            if gtk::IconTheme::default().has_icon(icon_name) {
                 player_icon_img.set_from_icon_name(Some(icon_name));
             } else {
                 println!("No icon found for {}", icon_name);

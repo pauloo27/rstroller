@@ -28,11 +28,9 @@ impl ArgParser {
     }
 
     pub fn add_flag(&mut self, flag: &'static CommandFlag) {
-        self.flags
-            .insert(format!("--{}", flag.name.to_string()), flag);
+        self.flags.insert(format!("--{}", flag.name), flag);
         if let Some(short_name) = flag.short_name {
-            self.flags
-                .insert(format!("-{}", short_name.to_string()), flag);
+            self.flags.insert(format!("-{}", short_name), flag);
         }
     }
 
@@ -60,13 +58,13 @@ impl ArgParser {
     }
 
     fn parse_flag(&self, arg: &str) -> AnyResult<Option<(String, String)>> {
-        if !arg.starts_with("-") {
+        if !arg.starts_with('-') {
             return Ok(None);
         }
 
-        let splitted_arg = arg.split("=").collect::<Vec<&str>>();
+        let splitted_arg = arg.split('=').collect::<Vec<&str>>();
         let flag_prefix = splitted_arg
-            .get(0)
+            .first()
             .map(|s| s.to_string())
             .context("invalid flag")?;
 

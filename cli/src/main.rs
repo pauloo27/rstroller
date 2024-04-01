@@ -16,7 +16,7 @@ static PLAYER_FLAG: Lazy<CommandFlag> = Lazy::new(|| {
 
 fn main() {
     let mut app = new_app();
-    if let None = app.run_cmd() {
+    if app.run_cmd().is_none() {
         println!("Unknown command");
         app.help();
     }

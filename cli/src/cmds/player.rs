@@ -3,7 +3,6 @@ use super::utils::{
 };
 use super::CommandName;
 use crate::core_definition::CommandExecContext;
-use common;
 use mpris::{DBusError, PlayerFinder};
 use std::process;
 use std::time::Duration;
@@ -156,7 +155,7 @@ pub fn set_preferred_player_cmd(ctx: CommandExecContext<CommandName>) {
             process::exit(1);
         }
         Some(player_name) => {
-            common::player::set_preferred_player_name(&player_name)
+            common::player::set_preferred_player_name(player_name)
                 .expect("Failed to set preferred player name");
             println!("Preferred player set to {}", player_name);
         }
@@ -203,7 +202,7 @@ pub fn list_players_cmd(_: CommandExecContext<CommandName>) {
         .find_all()
         .expect("Failed to list players");
 
-    if players.len() == 0 {
+    if players.is_empty() {
         println!("No players found");
         return;
     }

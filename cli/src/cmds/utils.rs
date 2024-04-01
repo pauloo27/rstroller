@@ -32,7 +32,7 @@ pub fn exec_player_action<F>(ctx: &CommandExecContext<CommandName>, action_name:
 where
     F: FnOnce(&mpris::Player) -> Result<(), DBusError>,
 {
-    exec_player_action_silent(&ctx, action_name, |player| {
+    exec_player_action_silent(ctx, action_name, |player| {
         action(player)?;
         println!(
             "Action {action_name} called on player {} ({})",
@@ -61,7 +61,7 @@ pub fn exec_player_action_silent<F>(
 
     match player {
         Some(player) => {
-            action(&player).expect(format!("Failed to call action {action_name}").as_str());
+            action(&player).unwrap_or_else(|_| panic!("Failed to call action {action_name}"))
         }
         None => {
             eprintln!("No player found");

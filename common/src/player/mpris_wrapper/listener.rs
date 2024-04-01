@@ -50,7 +50,7 @@ pub fn spawn_mpris_listener(
 
                     // the channed was closed...
                     // FIXME: close this thread earlier
-                    if let Err(_) = sender.blocking_send(player_state.clone()) {
+                    if sender.blocking_send(player_state.clone()).is_err() {
                         break;
                     }
                 }

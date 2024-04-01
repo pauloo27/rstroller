@@ -81,7 +81,7 @@ where
 
         println!();
         println!("Commands:");
-        for (_, cmd) in &self.commands {
+        for cmd in self.commands.values() {
             if cmd.usage.is_empty() {
                 println!("  {} - {}", cmd.name, cmd.description);
             } else {

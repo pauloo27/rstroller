@@ -54,7 +54,7 @@ fn apply_art(img: gtk::Image, path: PathBuf, css_provider: gtk::CssProvider) {
 
     thread::spawn(move || {
         let res = || -> AnyResult<DynamicImage> {
-            return Ok(ImageReader::open(path)?.with_guessed_format()?.decode()?);
+            Ok(ImageReader::open(path)?.with_guessed_format()?.decode()?)
         }();
 
         match res {
@@ -111,7 +111,7 @@ fn handle_remote_art(img: gtk::Image, art_url: String, css_provider: gtk::CssPro
 }
 
 fn download_file(url: String, dist_path: PathBuf, tx: mpsc::Sender<PathBuf>) -> AnyResult<()> {
-    dist_path.parent().map(|p| std::fs::create_dir_all(p));
+    dist_path.parent().map(std::fs::create_dir_all);
 
     let url = reqwest::Url::parse(&url)?;
     let mut resp = reqwest::blocking::get(url)?;

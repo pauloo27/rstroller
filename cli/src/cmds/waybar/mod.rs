@@ -12,7 +12,7 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::Receiver;
 
 pub fn waybar_cmd(ctx: CommandExecContext<CommandName>) {
-    if let Some(_) = ctx.args.flags.get("player") {
+    if ctx.args.flags.get("player").is_some() {
         eprintln!("Waybar mode does not support the --player flag");
         process::exit(1);
     };
@@ -53,7 +53,7 @@ pub async fn start_waybar_loop() {
                 if had_prev_player {
                     println!(
                         "{}",
-                        json!({"text": "Silence", "tooltip": "Nothing playing"}).to_string()
+                        json!({"text": "Silence", "tooltip": "Nothing playing"}),
                     );
                 }
                 std::thread::sleep(std::time::Duration::from_secs(1));
@@ -115,7 +115,7 @@ fn show(state: PlayerState) -> Result<(), DBusError> {
             ),
             format!(
                 "{} by {}{}",
-                escape_gtk_markup(&title),
+                escape_gtk_markup(title),
                 escape_gtk_markup(&artists),
                 match album {
                     Some(album) if !album.is_empty() =>
@@ -130,7 +130,7 @@ fn show(state: PlayerState) -> Result<(), DBusError> {
                 icon,
                 escape_gtk_markup(&common::utils::truncate_string(title, 40))
             ),
-            format!("{}", escape_gtk_markup(title)),
+            escape_gtk_markup(title),
         ),
     };
 
@@ -139,7 +139,7 @@ fn show(state: PlayerState) -> Result<(), DBusError> {
         "tooltip": &tooltip,
     });
 
-    println!("{}", output.to_string());
+    println!("{}", output);
 
     Ok(())
 }
@@ -152,7 +152,7 @@ fn parse_artists(artists: Option<Vec<&str>>) -> Option<String> {
             }
             let joined_artists = artists.join(", ");
 
-            if joined_artists == "" {
+            if joined_artists.is_empty() {
                 return None;
             }
 
