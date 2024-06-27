@@ -39,7 +39,7 @@ fn new_app() -> App<'static, CommandName> {
         &cmds::list_players_cmd,
     ))
     .add_command(Command::new_with_usage(
-        CommandName::SetPreferredPlayer,
+        CommandName::SetPlayer,
         "<player>",
         "set the preferred player",
         &cmds::set_preferred_player_cmd,
