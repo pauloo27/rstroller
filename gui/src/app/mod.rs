@@ -86,7 +86,7 @@ impl App {
         let window = gtk::ApplicationWindow::builder()
             .application(&self.gtk_app)
             .title("Rstroller")
-            .default_width(WINDOW_WIDTH)
+            .width_request(WINDOW_WIDTH)
             .default_height(200)
             .css_name("rstroller-window")
             .build();
