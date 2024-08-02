@@ -81,10 +81,43 @@ fn apply_art(img: gtk::Image, path: PathBuf, css_provider: gtk::CssProvider) {
 
     glib::spawn_future_local(async move {
         let (color1, color2) = rx.recv().expect("Failed to receive color");
+
+        let is_bright = (color_brightness(&color1) + color_brightness(&color2)) / 2.0 > 0.5;
+
+        let progress_color = if is_bright {
+            "rgba(0, 0, 0, 0.5)"
+        } else {
+            "rgba(255, 255, 255, 0.5)"
+        };
+
+        let win_bg_opacity = if is_bright { 0.4 } else { 0.5 };
+
         css_provider.load_from_data(
-            format!("rstroller-window {{ background-image: linear-gradient(to right, {color1} 0%, {color2} 100%); }}").as_str(),
+            format!(
+                "
+                main-container {{
+                  background-color: rgba(255, 255, 255, {win_bg_opacity});
+                }}
+
+                .player-progress-scale trough highlight {{
+                  background: {progress_color};
+                }}
+
+                rstroller-window {{
+                     background-image: linear-gradient(to right, {color1} 0%, {color2} 100%); 
+                }}
+                "
+            )
+            .as_str(),
         );
     });
+}
+
+fn color_brightness(hex_color: &str) -> f64 {
+    let r = u8::from_str_radix(&hex_color[1..3], 16).unwrap() as f64 / 255.0;
+    let g = u8::from_str_radix(&hex_color[3..5], 16).unwrap() as f64 / 255.0;
+    let b = u8::from_str_radix(&hex_color[5..7], 16).unwrap() as f64 / 255.0;
+    r * 0.299 + g * 0.587 + b * 0.114
 }
 
 fn handle_remote_art(img: gtk::Image, art_url: String, css_provider: gtk::CssProvider) {

@@ -16,19 +16,25 @@ pub fn new(app: &App) -> gtk::Box {
     container.append(&title_lbl);
     container.append(&artist_lbl);
 
-    app.add_listener(clone!(#[weak] title_lbl, #[weak] artist_lbl, move |p| {
-        let title_txt = p.metadata.title().unwrap_or("Unknown");
-        title_lbl.set_tooltip_text(Some(title_txt));
-        title_lbl.set_text(&common::utils::truncate_string(title_txt, 25));
+    app.add_listener(clone!(
+        #[weak]
+        title_lbl,
+        #[weak]
+        artist_lbl,
+        move |p| {
+            let title_txt = p.metadata.title().unwrap_or("Unknown");
+            title_lbl.set_tooltip_text(Some(title_txt));
+            title_lbl.set_text(&common::utils::truncate_string(title_txt, 25));
 
-        let artist_txt = match p.metadata.artists() {
-            Some(artists) => artists.join(", "),
-            None => "Unknown".to_string(),
-        };
+            let artist_txt = match p.metadata.artists() {
+                Some(artists) => artists.join(", "),
+                None => "Unknown".to_string(),
+            };
 
-        artist_lbl.set_tooltip_text(Some(&artist_txt));
-        artist_lbl.set_text(&common::utils::truncate_string(&artist_txt, 30));
-    }));
+            artist_lbl.set_tooltip_text(Some(&artist_txt));
+            artist_lbl.set_text(&common::utils::truncate_string(&artist_txt, 30));
+        }
+    ));
 
     container
 }

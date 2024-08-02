@@ -159,9 +159,13 @@ fn create_more_popover(app: Rc<App>, btn: &gtk::MenuButton) -> gtk::Popover {
         }
     ));
 
-    app.add_listener(clone!(#[weak] shuffle_btn, move |state| {
-        shuffle_btn.set_active(state.shuffle);
-    }));
+    app.add_listener(clone!(
+        #[weak]
+        shuffle_btn,
+        move |state| {
+            shuffle_btn.set_active(state.shuffle);
+        }
+    ));
 
     container.append(&shuffle_btn);
     container.append(&raise_btn);

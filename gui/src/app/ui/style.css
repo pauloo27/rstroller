@@ -8,10 +8,19 @@ player-name-label {
 }
 
 main-container {
-  background-color: rgba(0, 0, 0, 0.25);
   padding-bottom: 10px;
 }
 
 info-container {
   padding: 10px;
+}
+
+.player-progress-scale slider {
+  background: none;
+  box-shadow: none;
+  border: none;
+}
+
+.player-progress-scale trough {
+  border: none;
 }

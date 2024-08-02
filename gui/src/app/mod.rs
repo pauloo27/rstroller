@@ -1,10 +1,10 @@
 mod ui;
 
+use adw::prelude::*;
 use std::sync::mpsc;
 use std::{cell::RefCell, rc::Rc};
 
 use gtk::glib::{self, clone};
-use gtk::prelude::*;
 use gtk4 as gtk;
 
 use common::player::{PlayerAction, PlayerState};
@@ -17,7 +17,7 @@ pub const WINDOW_WIDTH: i32 = 250;
 type MprisListener = dyn Fn(&PlayerState);
 
 pub struct App {
-    gtk_app: gtk::Application,
+    adw_app: adw::Application,
     listeners: RefCell<Vec<Box<MprisListener /*---[*/>>>,
     most_recent_state: RefCell<Option<PlayerState>>,
     action_sender: RefCell<Option<mpsc::Sender<PlayerAction>>>,
@@ -26,19 +26,19 @@ pub struct App {
 // public interface
 impl App {
     pub fn new() -> Self {
-        let gtk_app = gtk::Application::builder().application_id(APP_ID).build();
+        let adw_app = adw::Application::builder().application_id(APP_ID).build();
 
         App {
             most_recent_state: RefCell::new(None),
-            gtk_app,
+            adw_app,
             listeners: RefCell::new(Vec::new()),
             action_sender: RefCell::new(None),
         }
     }
 
     pub fn run(self: Rc<Self>) -> i32 {
-        self.gtk_app.connect_startup(|_| Self::load_global_css());
-        self.gtk_app.connect_activate(clone!(
+        self.adw_app.connect_startup(|_| Self::load_global_css());
+        self.adw_app.connect_activate(clone!(
             #[weak(rename_to=app)]
             self,
             move |_| {
@@ -47,7 +47,7 @@ impl App {
             }
         ));
 
-        self.gtk_app.run().value()
+        self.adw_app.run().value()
     }
 
     pub fn add_listener<F>(&self, listener: F)
@@ -86,8 +86,8 @@ impl App {
     }
 
     fn setup_ui(self: Rc<Self>) {
-        let window = gtk::ApplicationWindow::builder()
-            .application(&self.gtk_app)
+        let window = adw::ApplicationWindow::builder()
+            .application(&self.adw_app)
             .title("Rstroller")
             .width_request(WINDOW_WIDTH)
             .default_height(200)
@@ -110,12 +110,12 @@ impl App {
         main_container.append(&info_container);
 
         info_container.append(&ui::track_info::new(&self));
-        //info_container.append(&ui::player_progress::new(self.clone()));
+        info_container.append(&ui::player_progress::new(self.clone()));
         info_container.append(&ui::player_controller::new(self.clone()));
 
         main_container.append(&ui::player_info::new(&self));
 
-        window.set_child(Some(&main_container));
+        window.set_content(Some(&main_container));
 
         window.present();
     }

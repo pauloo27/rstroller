@@ -18,8 +18,12 @@ pub fn new(app: &App) -> gtk::Box {
     container.append(&player_name_lbl);
     container.append(&player_icon_img);
 
-    app.add_listener(
-        clone!(#[weak] player_icon_img, #[weak] player_name_lbl, move |p| {
+    app.add_listener(clone!(
+        #[weak]
+        player_icon_img,
+        #[weak]
+        player_name_lbl,
+        move |p| {
             player_name_lbl.set_text(format!("Playing in {}", p.identity).as_str());
             player_name_lbl.set_tooltip_text(Some(p.identity.as_str()));
 
@@ -32,8 +36,8 @@ pub fn new(app: &App) -> gtk::Box {
                 println!("No icon found for {}", icon_name);
                 player_icon_img.set_icon_name(Some("media-optical"));
             }
-        }),
-    );
+        }
+    ));
 
     container
 }
