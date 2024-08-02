@@ -30,20 +30,24 @@ pub fn new(app: &App) -> gtk::Image {
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
 
-    app.add_listener(clone!(@weak img => move |state| {
-        img.set_tooltip_text(state.metadata.album_name());
+    app.add_listener(clone!(
+        #[weak]
+        img,
+        move |state| {
+            img.set_tooltip_text(state.metadata.album_name());
 
-        if let Some(art_url) = state.metadata.art_url() {
-            if art_url.starts_with("file://") {
-                let path = art_url.replace("file://", "");
-                apply_art(img, Path::new(&path).to_path_buf(), css_provider.clone());
-            } else if art_url.starts_with("http://") || art_url.starts_with("https://") {
-                handle_remote_art(img, art_url.to_string(), css_provider.clone());
-            } else {
-                img.set_from_icon_name(None);
+            if let Some(art_url) = state.metadata.art_url() {
+                if art_url.starts_with("file://") {
+                    let path = art_url.replace("file://", "");
+                    apply_art(img, Path::new(&path).to_path_buf(), css_provider.clone());
+                } else if art_url.starts_with("http://") || art_url.starts_with("https://") {
+                    handle_remote_art(img, art_url.to_string(), css_provider.clone());
+                } else {
+                    img.set_icon_name(None);
+                }
             }
         }
-    }));
+    ));
 
     img
 }

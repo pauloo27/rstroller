@@ -13,7 +13,7 @@ pub fn new(app: Rc<App>) -> gtk::Scale {
         .adjustment(&gtk::Adjustment::new(0.0, 0.0, 1.0, 0.01, 0.0, 0.0))
         .build();
 
-    scale.connect_value_changed(clone!(@weak app => move |scale| {
+    scale.connect_value_changed(clone!(#[weak] app, move |scale| {
         let state = app.most_recent_state.borrow();
         if let Some(state) = state.as_ref() {
             let new_duration =  state.metadata.length_in_microseconds().unwrap_or(0) as f64 * scale.value();

@@ -38,11 +38,14 @@ impl App {
 
     pub fn run(self: Rc<Self>) -> i32 {
         self.gtk_app.connect_startup(|_| Self::load_global_css());
-        self.gtk_app
-            .connect_activate(clone!(@weak self as app => move |_| {
+        self.gtk_app.connect_activate(clone!(
+            #[weak(rename_to=app)]
+            self,
+            move |_| {
                 app.clone().setup_ui();
                 app.listen_to_mpris();
-            }));
+            }
+        ));
 
         self.gtk_app.run().value()
     }
@@ -146,12 +149,16 @@ impl App {
             }
         }
 
-        glib::spawn_future_local(clone!(@weak self as app => async move {
-            while let Some(state) = player_rx.recv().await {
+        glib::spawn_future_local(clone!(
+            #[weak(rename_to = app)]
+            self,
+            async move {
+                while let Some(state) = player_rx.recv().await {
                     app.emit_player_state(state);
+                }
+                eprintln!("Player shut down");
+                process::exit(0);
             }
-            eprintln!("Player shut down");
-            process::exit(0);
-        }));
+        ));
     }
 }

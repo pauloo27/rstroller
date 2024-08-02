@@ -41,28 +41,44 @@ pub fn new(app: Rc<App>) -> gtk::Box {
         .tooltip_text("More")
         .build();
 
-    play_btn.connect_clicked(clone!(@weak app => move |_| {
-        app.send_action(PlayerAction::PlayPause);
-    }));
+    play_btn.connect_clicked(clone!(
+        #[weak]
+        app,
+        move |_| {
+            app.send_action(PlayerAction::PlayPause);
+        }
+    ));
 
-    prev_btn.connect_clicked(clone!(@weak app => move |_| {
-        app.send_action(PlayerAction::Previous);
-    }));
+    prev_btn.connect_clicked(clone!(
+        #[weak]
+        app,
+        move |_| {
+            app.send_action(PlayerAction::Previous);
+        }
+    ));
 
-    next_btn.connect_clicked(clone!(@weak app => move |_| {
-        app.send_action(PlayerAction::Next);
-    }));
+    next_btn.connect_clicked(clone!(
+        #[weak]
+        app,
+        move |_| {
+            app.send_action(PlayerAction::Next);
+        }
+    ));
 
     create_volume_popover(app.clone(), &volume_btn);
     create_more_popover(app.clone(), &more_btn);
 
-    app.add_listener(clone!(@weak play_btn => move |state| {
-        let icon_name = match state.playback_status {
-            mpris::PlaybackStatus::Playing => "media-playback-pause-symbolic",
-            _ => "media-playback-start-symbolic",
-        };
-        play_btn.set_icon_name(icon_name);
-    }));
+    app.add_listener(clone!(
+        #[weak]
+        play_btn,
+        move |state| {
+            let icon_name = match state.playback_status {
+                mpris::PlaybackStatus::Playing => "media-playback-pause-symbolic",
+                _ => "media-playback-start-symbolic",
+            };
+            play_btn.set_icon_name(icon_name);
+        }
+    ));
 
     container.append(&volume_btn);
     container.append(&prev_btn);
@@ -83,16 +99,24 @@ fn create_volume_popover(app: Rc<App>, btn: &gtk::MenuButton) -> gtk::Popover {
 
     btn.set_popover(Some(&popover));
 
-    app.add_listener(clone!(@weak scale => move |state| {
-        scale.set_value(state.volume);
-    }));
+    app.add_listener(clone!(
+        #[weak]
+        scale,
+        move |state| {
+            scale.set_value(state.volume);
+        }
+    ));
 
-    scale.connect_value_changed(clone!(@weak app => move |scale| {
-        let volume = scale.value();
-        let volume = (volume * 100.0).round() / 100.0;
+    scale.connect_value_changed(clone!(
+        #[weak]
+        app,
+        move |scale| {
+            let volume = scale.value();
+            let volume = (volume * 100.0).round() / 100.0;
 
-        app.send_action(PlayerAction::Volume(volume));
-    }));
+            app.send_action(PlayerAction::Volume(volume));
+        }
+    ));
 
     let (w, h) = scale.size_request();
     scale.set_size_request(w, h + 100);
@@ -119,15 +143,23 @@ fn create_more_popover(app: Rc<App>, btn: &gtk::MenuButton) -> gtk::Popover {
         .tooltip_text("Raise Player")
         .build();
 
-    raise_btn.connect_clicked(clone!(@weak app => move |_| {
-        app.send_action(PlayerAction::Raise);
-    }));
+    raise_btn.connect_clicked(clone!(
+        #[weak]
+        app,
+        move |_| {
+            app.send_action(PlayerAction::Raise);
+        }
+    ));
 
-    shuffle_btn.connect_toggled(clone!(@weak app => move |btn| {
-        app.send_action(PlayerAction::Shuffle(btn.is_active()));
-    }));
+    shuffle_btn.connect_toggled(clone!(
+        #[weak]
+        app,
+        move |btn| {
+            app.send_action(PlayerAction::Shuffle(btn.is_active()));
+        }
+    ));
 
-    app.add_listener(clone!(@weak shuffle_btn => move |state| {
+    app.add_listener(clone!(#[weak] shuffle_btn, move |state| {
         shuffle_btn.set_active(state.shuffle);
     }));
 
