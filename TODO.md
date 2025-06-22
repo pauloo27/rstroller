@@ -1,16 +1,13 @@
 # To-Do
 
-- `core` fsnotify to preferred player file
-- `gui` play/pause buttons
-- `gui` prev/next buttons
+- `*` solve warnings :(
+- `*` review code?
 
 # Backlog
 
+- `gui` solve the threads/channels mess?
+- `gui` fix the volume controller
 - `gui` position controller
-- `gui` volume controller
-- `gui` show album
-- `gui` use album as bg color
 - `gui` player selector
-- `gui` raise player
-- `gui` shuffle button
 - `gui` loop button
+- `core` preferred player as file? that sounds kinda crazy. change it?
