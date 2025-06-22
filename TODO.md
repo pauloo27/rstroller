@@ -1,6 +1,5 @@
 # To-Do
 
-- `*` solve warnings :(
 - `*` review code?
 
 # Backlog

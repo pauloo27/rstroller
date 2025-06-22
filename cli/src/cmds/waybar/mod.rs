@@ -12,7 +12,7 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::Receiver;
 
 pub fn waybar_cmd(ctx: CommandExecContext<CommandName>) {
-    if ctx.args.flags.get("player").is_some() {
+    if ctx.args.flags.contains_key("player") {
         eprintln!("Waybar mode does not support the --player flag");
         process::exit(1);
     };
