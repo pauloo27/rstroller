@@ -1,5 +1,5 @@
 mod mpris_wrapper;
-mod preferred_player;
+mod preferred;
 
 pub use mpris_wrapper::*;
-pub use preferred_player::*;
+pub use preferred::*;
