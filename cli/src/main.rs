@@ -44,6 +44,12 @@ fn new_app() -> App<'static, CommandName> {
         "set the preferred player",
         &cmds::set_preferred_player_cmd,
     ))
+    .add_command(Command::new_with_usage(
+        CommandName::ScrollPlayer,
+        "<up/down>",
+        "cycle the preferred player",
+        &cmds::scroll_preferred_player_cmd,
+    ))
     .add_command(Command::new(
         CommandName::Status,
         "get the playback status of the player",

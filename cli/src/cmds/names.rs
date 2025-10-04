@@ -8,6 +8,7 @@ pub enum CommandName {
     List,
     Status,
     SetPlayer,
+    ScrollPlayer,
     Play,
     Pause,
     PlayPause,
@@ -31,6 +32,7 @@ impl CommandName {
             CommandName::List => "list",
             CommandName::Status => "status",
             CommandName::SetPlayer => "set-player",
+            CommandName::ScrollPlayer => "scroll-player",
             CommandName::Play => "play",
             CommandName::Pause => "pause",
             CommandName::PlayPause => "play-pause",
@@ -60,6 +62,7 @@ impl FromStr for CommandName {
             "play" => Ok(CommandName::Play),
             "pause" => Ok(CommandName::Pause),
             "play-pause" => Ok(CommandName::PlayPause),
+            "scroll-player" => Ok(CommandName::ScrollPlayer),
             "stop" => Ok(CommandName::Stop),
             "next" => Ok(CommandName::Next),
             "previous" => Ok(CommandName::Previous),
@@ -74,6 +77,12 @@ impl FromStr for CommandName {
             "show" => Ok(CommandName::Show),
             _ => Err(()),
         }
+    }
+}
+
+impl Display for CommandName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value())
     }
 }
 
@@ -107,11 +116,5 @@ mod tests {
             }
             values.insert(value, true);
         }
-    }
-}
-
-impl Display for CommandName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value())
     }
 }

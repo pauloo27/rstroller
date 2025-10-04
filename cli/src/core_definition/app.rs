@@ -81,6 +81,7 @@ where
 
         println!();
         println!("Commands:");
+        // FIXME: order
         for cmd in self.commands.values() {
             if cmd.usage.is_empty() {
                 println!("  {} - {}", cmd.name, cmd.description);

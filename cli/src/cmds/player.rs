@@ -73,7 +73,7 @@ pub fn position_cmd(ctx: CommandExecContext<CommandName>) {
             Some(value) => {
                 let offset = match value.chars().last().expect("Invalid position") {
                     '+' => parse_offset(value).expect("Invalid position"),
-                    '-' => parse_offset(value).expect("Invalid position") * -1.0,
+                    '-' => -parse_offset(value).expect("Invalid position"),
                     _ => {
                         let value = value.parse::<u64>().expect("Invalid position");
                         return player.set_position(track_id, &Duration::from_millis(value));
@@ -146,6 +146,64 @@ pub fn shuffle_cmd(ctx: CommandExecContext<CommandName>) {
     });
 }
 
+pub fn scroll_preferred_player_cmd(ctx: CommandExecContext<CommandName>) {
+    let direction = ctx.args.get(2);
+
+    match direction.map(String::as_str) {
+        None => {
+            eprintln!("Direction not provided, please use up or down");
+            process::exit(1);
+        }
+        Some("up") | Some("down") => {
+            let current_player_name = common::player::get_preferred_player_name()
+                .expect("Failed to get current preferred player");
+
+            let current_player_name = match current_player_name {
+                Some(current_player_name) => current_player_name,
+                None => {
+                    if let Some(first_player) =
+                        common::player::get_first_player().expect("Failed to get current players")
+                    {
+                        String::from(first_player.bus_name())
+                    } else {
+                        eprintln!("No players running");
+                        process::exit(1);
+                    }
+                }
+            };
+
+            let finder = PlayerFinder::new().expect("Failed to start player finder");
+            let players = finder.find_all().expect("Failed to list players");
+            let current_index = players
+                .iter()
+                .position(|p| p.bus_name() == current_player_name)
+                .unwrap_or(0);
+
+            let new_index = match direction.map(String::as_str).unwrap() {
+                "up" => {
+                    if current_index == 0 {
+                        players.len() - 1
+                    } else {
+                        current_index - 1
+                    }
+                }
+                "down" => (current_index + 1) % players.len(),
+                _ => unreachable!(),
+            };
+
+            let player_name = players[new_index].bus_name();
+
+            common::player::set_preferred_player_name(player_name)
+                .expect("Failed to set preferred player name");
+            println!("Preferred player set to {}", player_name);
+        }
+        Some(invalid) => {
+            eprintln!("Direction {invalid} is invalid, please use up or down");
+            process::exit(1);
+        }
+    }
+}
+
 pub fn set_preferred_player_cmd(ctx: CommandExecContext<CommandName>) {
     let player_name = ctx.args.get(2);
 
@@ -170,7 +228,7 @@ pub fn volume_cmd(ctx: CommandExecContext<CommandName>) {
             Some(value) => {
                 let offset = match value.chars().last().expect("Invalid volume") {
                     '+' => parse_offset(value).expect("Invalid volume"),
-                    '-' => parse_offset(value).expect("Invalid volume") * -1.0,
+                    '-' => -parse_offset(value).expect("Invalid volume"),
                     _ => {
                         return player.set_volume(value.parse::<f64>().expect("Invalid volume"));
                     }
