@@ -54,6 +54,10 @@ pub fn new(app: &App) -> gtk::Image {
 
 fn apply_art(img: gtk::Image, path: PathBuf, css_provider: gtk::CssProvider) {
     img.set_from_file(Some(&path));
+
+    // i have no idea why that works tho
+    img.set_pixel_size(WINDOW_WIDTH);
+
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
@@ -100,6 +104,8 @@ fn handle_remote_art(img: gtk::Image, art_url: String, css_provider: gtk::CssPro
 
     let (tx, rx) = mpsc::channel();
 
+    // that's not a "green thread", right? that's a messed up code. like the rest
+    // of the code base, so its fine
     thread::spawn(move || {
         download_file(art_url, path, tx)
             .map_err(|e| eprintln!("Failed to download album art: {}", e))
