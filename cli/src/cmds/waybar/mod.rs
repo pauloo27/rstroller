@@ -31,7 +31,13 @@ pub async fn start_waybar_loop() {
     let mut had_prev_player = true;
 
     loop {
-        let player = common::player::get_preferred_player_or_first().expect("Failed to get player");
+        let player = common::player::get_preferred_player_or_first();
+        if player.is_err() {
+            eprintln!("Failed to get preferred player, let's just try again?");
+            eprintln!("Error: {:?}", player.err());
+            continue;
+        }
+        let player = player.unwrap();
 
         match player {
             Some(ref player) => {
