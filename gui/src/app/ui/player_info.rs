@@ -20,7 +20,7 @@ pub fn new(app: &App) -> gtk::Box {
 
     app.add_listener(
         clone!(#[weak] player_icon_img, #[weak] player_name_lbl, move |p| {
-            player_name_lbl.set_text(format!("Playing in {}", p.identity).as_str());
+            player_name_lbl.set_text(format!("Playing on {}", p.identity).as_str());
             player_name_lbl.set_tooltip_text(Some(p.identity.as_str()));
 
             let icon_name = p.name.to_lowercase();
