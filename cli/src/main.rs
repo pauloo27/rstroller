@@ -1,6 +1,10 @@
 use std::process;
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
 
 use common::linux;
+use mpris::{PlayerEvents, PlayerFinder};
 
 fn main() {
     if !linux::is_linux() {
@@ -30,4 +34,51 @@ fn main() {
 
     TODO: waybar - still haven't figured out yet
     */
+
+    hello();
+}
+
+fn hello() {
+    let (stop_tx, stop_rx) = mpsc::channel();
+
+    // Spawn thread for event loop - create Player inside the thread
+    let handle = thread::spawn(move || {
+        let player = PlayerFinder::new()
+            .expect("Couldn't connect to MPRIS")
+            .find_active()
+            .expect("Couldn't find active player");
+
+        println!("Player found {}", player.bus_name());
+
+        let events = player.events().expect("Couldn't start event stream");
+
+        print_events(events, stop_rx);
+    });
+
+    // Wait 10 seconds then signal stop (later this will be based on player change logic)
+    thread::sleep(Duration::from_secs(10));
+    stop_tx.send(()).ok();
+
+    // Wait for thread to finish
+    handle.join().ok();
+
+    println!("Event stream ended.");
+}
+
+fn print_events(events: PlayerEvents, stop_rx: mpsc::Receiver<()>) {
+    for event in events {
+        // Check if we should stop
+        if stop_rx.try_recv().is_ok() {
+            println!("Stopping event loop");
+            break;
+        }
+
+        match event {
+            Ok(event) => println!("{:#?}", event),
+            Err(err) => {
+                println!("D-Bus error: {}. Aborting.", err);
+                break;
+            }
+        }
+    }
 }
