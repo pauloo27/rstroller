@@ -116,7 +116,7 @@ fn show(state: PlayerState) -> Result<(), DBusError> {
             format!(
                 "{} {} by {}",
                 icon,
-                escape_gtk_markup(&common::utils::truncate_string(title, 40)),
+                escape_gtk_markup(&common::utils::truncate_string(title, 30)),
                 escape_gtk_markup(&common::utils::truncate_string(&artists, 20)),
             ),
             format!(
