@@ -1308,8 +1308,16 @@ impl Player {
         }
     }
 
+    /// Process events in a blocking fashion until the given duration runs out.
+    ///
+    /// Returns `true` if there are pending events for this player after processing.
+    pub fn process_events_blocking_for(&self, duration: Duration) -> bool {
+        self.connection.process_events_blocking_for(duration);
+        self.connection.has_pending_events(&self.unique_name)
+    }
+
     /// Return any events that are pending (for this player) on the connection.
-    pub(crate) fn pending_events(&self) -> Vec<MprisEvent> {
+    pub fn pending_events(&self) -> Vec<MprisEvent> {
         self.connection.pending_events(&self.unique_name)
     }
 }

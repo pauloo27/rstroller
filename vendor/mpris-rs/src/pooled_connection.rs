@@ -253,7 +253,8 @@ impl From<Connection> for PooledConnection {
 /// bus and placed on queues for each player. When a component asks for pending events of a player
 /// they will be returned in the same order as they were emitted in.
 #[derive(Debug)]
-pub(crate) enum MprisEvent {
+#[allow(missing_docs)]
+pub enum MprisEvent {
     PlayerQuit,
     PlayerPropertiesChanged,
     Seeked {

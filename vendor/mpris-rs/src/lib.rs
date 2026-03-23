@@ -1,15 +1,4 @@
-#![warn(missing_docs)]
-#![deny(
-    missing_debug_implementations,
-    missing_copy_implementations,
-    trivial_casts,
-    trivial_numeric_casts,
-    unsafe_code,
-    unreachable_pub,
-    unstable_features,
-    unused_import_braces,
-    unused_qualifications
-)]
+#![allow(warnings)]
 
 //!
 //! # mpris
@@ -48,6 +37,7 @@ pub use crate::metadata::Metadata;
 pub use crate::metadata::Value as MetadataValue;
 pub use crate::metadata::ValueKind as MetadataValueKind;
 pub use crate::player::Player;
+pub use crate::pooled_connection::MprisEvent;
 pub use crate::progress::{Progress, ProgressError, ProgressTick, ProgressTracker};
 pub use crate::track_list::{TrackID, TrackList, TrackListError};
 

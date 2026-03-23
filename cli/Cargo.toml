@@ -6,5 +6,5 @@ edition = "2024"
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
 common = { path = "../common" }
-mpris = "2.0.1"
+mpris.workspace = true
 tokio = { version = "1", features = ["full"] }
