@@ -1,0 +1,20 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
+  fast_finish: true
+
+# Travis is starting to timeout all the time when using cache
+# cache: cargo
+
+addons:
+  apt:
+    packages:
+    - libdbus-1-dev # To be able to compile dbus-rs
+    - dbus # DBus server
+script:
+  - xvfb-run ./script/ci.sh
