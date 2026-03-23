@@ -1,10 +1,26 @@
-use std::process;
-use std::sync::mpsc;
-use std::thread;
-use std::time::Duration;
-
+use clap::{Parser, Subcommand};
 use common::linux;
-use mpris::PlayerFinder;
+use std::process;
+
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    /// Optional name to operate on
+    name: Option<String>,
+
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// does testing things
+    Test {
+        /// lists test values
+        #[arg(short, long)]
+        list: bool,
+    },
+}
 
 fn main() {
     if !linux::is_linux() {
@@ -12,9 +28,28 @@ fn main() {
         process::exit(32);
     }
 
+    let cli = Cli::parse();
+
+    // You can check the value provided by positional arguments, or option arguments
+    if let Some(name) = cli.name.as_deref() {
+        println!("Value for name: {name}");
+    }
+
+    // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+    match &cli.command {
+        Commands::Test { list } => {
+            if *list {
+                println!("Printing testing lists...");
+            } else {
+                println!("Not printing testing lists...");
+            }
+        }
+    }
+
     /*
+    DONE: help - show command usage
     TODO: set-player <player> - set the preferred player
-    TODO: help - show command usage
     TODO: show - show some information about the player
     TODO: play - send the "play" command to the player
     TODO: pause - send the "pause" command to the player
@@ -34,38 +69,4 @@ fn main() {
 
     TODO: waybar - still haven't figured out yet
     */
-
-    hello();
-}
-
-fn hello() {
-    let (stop_tx, stop_rx) = mpsc::channel();
-
-    let handle = thread::spawn(move || {
-        let player = PlayerFinder::new()
-            .expect("Couldn't connect to MPRIS")
-            .find_active()
-            .expect("Couldn't find active player");
-
-        println!("Player found {}", player.bus_name());
-
-        loop {
-            if stop_rx.try_recv().is_ok() {
-                println!("Stopping event loop");
-                break;
-            }
-
-            if player.process_events_blocking_for(Duration::from_millis(200)) {
-                for event in player.pending_events() {
-                    println!("{:#?}", event);
-                }
-            }
-        }
-    });
-
-    thread::sleep(Duration::from_secs(10));
-    stop_tx.send(()).ok();
-
-    handle.join().ok();
-    println!("Event stream ended.");
 }
