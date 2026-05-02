@@ -2,6 +2,7 @@ use std::{process::exit, sync::RwLock};
 
 use dbus::blocking::{Connection, stdintf::org_freedesktop_dbus::RequestNameReply};
 use dbus_crossroads::Crossroads;
+use mpris::{FindingError, PlayerFinder};
 
 mod preferred_player;
 
@@ -10,8 +11,8 @@ struct ServerState {
 }
 
 pub fn main() {
-    let conn = Connection::new_session().expect("Failed to create dbus session");
-    let request_reply = conn
+    let server_conn = Connection::new_session().expect("Failed to create dbus server session");
+    let request_reply = server_conn
         .request_name("cafe.db.code.Rstroller", false, false, true)
         .expect("Failed to request name");
 
@@ -38,13 +39,22 @@ pub fn main() {
         preferred_player::register_property,
     );
 
+    let initial_player = match PlayerFinder::new()
+        .expect("Failed to create dbus client session")
+        .find_active()
+    {
+        Ok(p) => p.bus_name().to_string(),
+        Err(FindingError::NoPlayerFound) => "".to_string(),
+        Err(e) => panic!("Failed to find active player: {e}"),
+    };
+
     cr.insert(
         "/cafe/db/code/Rstroller",
         &[iface_token],
         ServerState {
-            preferred_player: RwLock::new("".to_string()),
+            preferred_player: RwLock::new(initial_player),
         },
     );
 
-    cr.serve(&conn).expect("Failed to serve");
+    cr.serve(&server_conn).expect("Failed to serve");
 }

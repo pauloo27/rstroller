@@ -7,3 +7,4 @@ edition = "2024"
 common = { path = "../common" }
 dbus = "0.9.11"
 dbus-crossroads = "0.5.3"
+mpris.workspace = true
