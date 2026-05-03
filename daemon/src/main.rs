@@ -1,4 +1,4 @@
-use std::{process::exit, thread};
+use std::{process::exit, sync::Arc, thread};
 
 use dbus::blocking::{Connection, stdintf::org_freedesktop_dbus::RequestNameReply};
 use dbus_crossroads::Crossroads;
@@ -7,6 +7,8 @@ use crate::server_state::ServerState;
 
 mod dbus_interface;
 mod server_state;
+
+const DBUS_PATH: &str = "/cafe/db/code/Rstroller";
 
 /*
 To get:
@@ -35,13 +37,14 @@ pub fn main() {
     let iface_token = cr.register("cafe.db.code.Rstroller", dbus_interface::register_property);
 
     let state = ServerState::load_initial().expect("Failed to load initial player");
+    let state = Arc::new(state);
 
-    cr.insert("/cafe/db/code/Rstroller", &[iface_token], state);
+    cr.insert(DBUS_PATH, &[iface_token], state.clone());
 
-    let child = thread::spawn(move || {
-        println!("Starting dbus server...");
-        cr.serve(&server_conn).expect("Failed to serve");
+    thread::spawn(move || {
+        state.watch_for_changes();
     });
 
-    child.join().expect("oops! the child thread panicked");
+    println!("Starting dbus server...");
+    cr.serve(&server_conn).expect("Failed to serve");
 }
