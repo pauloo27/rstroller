@@ -1,14 +1,23 @@
-use std::{process::exit, sync::RwLock};
+use std::{process::exit, thread};
 
 use dbus::blocking::{Connection, stdintf::org_freedesktop_dbus::RequestNameReply};
 use dbus_crossroads::Crossroads;
-use mpris::{FindingError, PlayerFinder};
 
-mod preferred_player;
+use crate::server_state::ServerState;
 
-struct ServerState {
-    preferred_player: RwLock<String>,
-}
+mod dbus_interface;
+mod server_state;
+
+/*
+To get:
+busctl --user get-property cafe.db.code.Rstroller /cafe/db/code/Rstroller cafe.db.code.Rstroller PreferredPlayer
+
+To set:
+busctl --user set-property cafe.db.code.Rstroller /cafe/db/code/Rstroller cafe.db.code.Rstroller PreferredPlayer s "player_name"
+
+To monitor:
+dbus-monitor --session "type='signal',sender='cafe.db.code.Rstroller'"
+*/
 
 pub fn main() {
     let server_conn = Connection::new_session().expect("Failed to create dbus server session");
@@ -21,40 +30,18 @@ pub fn main() {
         exit(8);
     }
 
-    /*
-    To get:
-    busctl --user get-property cafe.db.code.Rstroller /cafe/db/code/Rstroller cafe.db.code.Rstroller PreferredPlayer
-
-    To set:
-    busctl --user set-property cafe.db.code.Rstroller /cafe/db/code/Rstroller cafe.db.code.Rstroller PreferredPlayer s "player_name"
-
-    To monitor:
-    dbus-monitor --session "type='signal',sender='cafe.db.code.Rstroller'"
-    */
-
     let mut cr = Crossroads::new();
 
-    let iface_token = cr.register(
-        "cafe.db.code.Rstroller",
-        preferred_player::register_property,
-    );
+    let iface_token = cr.register("cafe.db.code.Rstroller", dbus_interface::register_property);
 
-    let initial_player = match PlayerFinder::new()
-        .expect("Failed to create dbus client session")
-        .find_active()
-    {
-        Ok(p) => p.bus_name().to_string(),
-        Err(FindingError::NoPlayerFound) => "".to_string(),
-        Err(e) => panic!("Failed to find active player: {e}"),
-    };
+    let state = ServerState::load_initial().expect("Failed to load initial player");
 
-    cr.insert(
-        "/cafe/db/code/Rstroller",
-        &[iface_token],
-        ServerState {
-            preferred_player: RwLock::new(initial_player),
-        },
-    );
+    cr.insert("/cafe/db/code/Rstroller", &[iface_token], state);
 
-    cr.serve(&server_conn).expect("Failed to serve");
+    let child = thread::spawn(move || {
+        println!("Starting dbus server...");
+        cr.serve(&server_conn).expect("Failed to serve");
+    });
+
+    child.join().expect("oops! the child thread panicked");
 }
